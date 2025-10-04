@@ -1,0 +1,213 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Order {{ order.order_number }} - UrbanFoods Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Order #{{ order.order_number }}</h2>
+        <div>
+            <a href="{% url 'admin_orders' %}" class="btn btn-secondary">Back to Orders</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Order Details</h5>
+                        <span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <p><strong>Name:</strong> {{ order.user.get_full_name|default:order.user.username }}</p>
+                            <p><strong>Email:</strong> {{ order.user.email }}</p>
+                            <p><strong>Phone:</strong> {{ order.user.phone_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Delivery Information</h6>
+                            <p><strong>Hostel:</strong> {{ order.hostel }}</p>
+                            <p><strong>Room:</strong> {{ order.room_number }}</p>
+                            <p><strong>Phone:</strong> {{ order.phone_number }}</p>
+                            {% if order.delivery_notes %}
+                            <p><strong>Notes:</strong> {{ order.delivery_notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.food_item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>KES {{ item.price_at_order }}</td>
+                                    <td>KES {{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>KES {{ order.subtotal }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Delivery Fee:</span>
+                                    <span>KES {{ order.delivery_fee }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <span>Total:</span>
+                                    <span>KES {{ order.total }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Status Update -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Update Status</h6>
+                </div>
+                <div class="card-body">
+                    <form id="statusForm">
+                        <div class="mb-3">
+                            <label for="newStatus" class="form-label">Status</label>
+                            <select class="form-select" id="newStatus" name="status">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
+                                <option value="out_for_delivery" {% if order.status == 'out_for_delivery' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="statusNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="statusNotes" name="notes" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Status History -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Status History</h6>
+                </div>
+                <div class="card-body">
+                    {% if status_history %}
+                    <div class="timeline">
+                        {% for history in status_history %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">{{ history.get_status_display }}</h6>
+                                <small class="text-muted">{{ history.timestamp|date:"M d, Y H:i" }}</small>
+                                {% if history.notes %}
+                                <p class="mb-0 mt-1">{{ history.notes }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No status history available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -25px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 13px;
+    width: 2px;
+    height: calc(100% + 5px);
+    background-color: #dee2e6;
+}
+
+.timeline-content h6 {
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+document.getElementById('statusForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const status = document.getElementById('newStatus').value;
+    const notes = document.getElementById('statusNotes').value;
+    
+    fetch('{% url "update_order_status" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            order_number: '{{ order.order_number }}',
+            status: status,
+            notes: notes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error updating order status');
+        }
+    });
+});
+</script>
+{% endblock %}

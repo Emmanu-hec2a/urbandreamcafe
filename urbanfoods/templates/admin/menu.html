@@ -1,0 +1,459 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Menu Management - UrbanFoods Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Menu Management</h2>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                Add Category
+            </button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                Add Food Item
+            </button>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Food Categories</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for category in categories %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ category.name }}</h6>
+                            <p class="card-text">{{ category.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Order: {{ category.order }}</small>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary edit-category-btn" 
+                    data-id="{{ category.id }}" 
+                    data-name="{{ category.name }}" 
+                    data-description="{{ category.description }}" 
+                    data-order="{{ category.order }}">
+                Edit
+            </button>
+            <button class="btn btn-outline-danger delete-category-btn" data-id="{{ category.id }}">
+                Delete
+            </button>
+        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted text-center">No categories found. Add your first category!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Items Section -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Food Items</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Prep Time</th>
+                            <th>Available</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in food_items %}
+                        <tr>
+                            <td>
+                                {% if item.image %}
+                                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <span class="text-muted">No img</span>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.category.name }}</td>
+                            <td>
+                                <span class="price-display">KES {{ item.price }}</span>
+                                <input type="number" class="form-control form-control-sm d-none price-input" 
+                                       value="{{ item.price }}" data-id="{{ item.id }}" step="0.01">
+                            </td>
+                            <td>{{ item.prep_time }} min</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input availability-toggle" type="checkbox" 
+                                           data-id="{{ item.id }}" {% if item.is_available %}checked{% endif %}>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary edit-item-btn" 
+                                            data-id="{{ item.id }}" 
+                                            data-name="{{ item.name }}" 
+                                            data-description="{{ item.description }}" 
+                                            data-category="{{ item.category.id }}" 
+                                            data-price="{{ item.price }}" 
+                                            data-prep-time="{{ item.prep_time }}">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-outline-danger delete-item-btn" data-id="{{ item.id }}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <input type="hidden" id="categoryId" value="">
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="categoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryOrder" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="categoryOrder" value="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Food Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addItemForm" enctype="multipart/form-data">
+                    <input type="hidden" id="itemId" value="">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="itemName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="itemCategory" class="form-label">Category</label>
+                                <select class="form-select" id="itemCategory" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="itemPrice" class="form-label">Price (KES)</label>
+                                <input type="number" class="form-control" id="itemPrice" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="itemPrepTime" class="form-label">Prep Time (minutes)</label>
+                                <input type="number" class="form-control" id="itemPrepTime" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="itemDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="itemDescription" rows="4" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="itemImage" class="form-label">Image</label>
+                                <input type="file" class="form-control" id="itemImage" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveItemBtn">Save Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Availability toggle
+    document.querySelectorAll('.availability-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const itemId = this.dataset.id;
+            const isAvailable = this.checked;
+            
+            fetch('{% url "toggle_food_availability" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    food_item_id: itemId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    this.checked = !isAvailable;
+                    alert('Error updating availability');
+                }
+            });
+        });
+    });
+    
+    // Price editing
+    document.querySelectorAll('.price-display').forEach(display => {
+        display.addEventListener('click', function() {
+            this.classList.add('d-none');
+            this.nextElementSibling.classList.remove('d-none');
+            this.nextElementSibling.focus();
+        });
+    });
+    
+    document.querySelectorAll('.price-input').forEach(input => {
+        input.addEventListener('blur', function() {
+            const itemId = this.dataset.id;
+            const newPrice = parseFloat(this.value);
+            
+            if (newPrice > 0) {
+                fetch('{% url "update_food_price" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        food_item_id: itemId,
+                        price: newPrice
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.previousElementSibling.textContent = 'KES ' + newPrice;
+                    } else {
+                        alert('Error updating price');
+                        this.value = this.previousElementSibling.textContent.replace('KES ', '');
+                    }
+                });
+            }
+            
+            this.classList.add('d-none');
+            this.previousElementSibling.classList.remove('d-none');
+        });
+        
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
+
+    // Edit category button click
+    document.querySelectorAll('.edit-category-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const description = this.dataset.description;
+            const order = this.dataset.order;
+
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryName').value = name;
+            document.getElementById('categoryDescription').value = description;
+            document.getElementById('categoryOrder').value = order;
+
+            var addCategoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+            addCategoryModal.show();
+        });
+    });
+
+    // Save category button click
+    document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+        const id = document.getElementById('categoryId').value;
+        const name = document.getElementById('categoryName').value;
+        const description = document.getElementById('categoryDescription').value;
+        const order = document.getElementById('categoryOrder').value;
+
+        const url = id ? `{% url 'edit_category' %}` : `{% url 'add_category' %}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                id: id,
+                name: name,
+                description: description,
+                order: order
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error saving category');
+            }
+        });
+    });
+
+    // Delete category button click
+    document.querySelectorAll('.delete-category-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to delete this category?')) return;
+
+            const id = this.dataset.id;
+
+            fetch(`{% url 'delete_category' %}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting category');
+                }
+            });
+        });
+    });
+
+    // Edit item button click
+    document.querySelectorAll('.edit-item-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const description = this.dataset.description;
+            const category = this.dataset.category;
+            const price = this.dataset.price;
+            const prepTime = this.dataset.prepTime;
+
+            document.getElementById('itemId').value = id;
+            document.getElementById('itemName').value = name;
+            document.getElementById('itemDescription').value = description;
+            document.getElementById('itemCategory').value = category;
+            document.getElementById('itemPrice').value = price;
+            document.getElementById('itemPrepTime').value = prepTime;
+
+            var addItemModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+            addItemModal.show();
+        });
+    });
+
+    // Save item button click
+    document.getElementById('saveItemBtn').addEventListener('click', function() {
+        const id = document.getElementById('itemId').value;
+        const name = document.getElementById('itemName').value;
+        const description = document.getElementById('itemDescription').value;
+        const category = document.getElementById('itemCategory').value;
+        const price = document.getElementById('itemPrice').value;
+        const prepTime = document.getElementById('itemPrepTime').value;
+        const imageInput = document.getElementById('itemImage');
+
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('category', category);
+        formData.append('price', price);
+        formData.append('prep_time', prepTime);
+        if (imageInput.files.length > 0) {
+            formData.append('image', imageInput.files[0]);
+        }
+
+        const url = id ? `{% url 'edit_food_item' %}` : `{% url 'add_food_item' %}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error saving food item');
+            }
+        });
+    });
+
+    // Delete item button click
+    document.querySelectorAll('.delete-item-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to delete this food item?')) return;
+
+            const id = this.dataset.id;
+
+            fetch(`{% url 'delete_food_item' %}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting food item');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

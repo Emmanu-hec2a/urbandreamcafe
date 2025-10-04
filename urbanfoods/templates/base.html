@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UrbanFoods - Campus Food Delivery{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'homepage' %}">
+                <span class="text-success">🍔 UrbanFoods</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'my_orders' %}">My Orders</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <!-- Theme Toggle -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="themeDropdown" role="button" data-bs-toggle="dropdown">
+                            <i id="themeIcon" class="fas fa-sun"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="fas fa-sun me-2"></i>Light</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="fas fa-moon me-2"></i>Dark</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="fas fa-adjust me-2"></i>System</a></li>
+                        </ul>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="#" onclick="toggleCart()">
+                                Cart
+                                <span id="cartBadge" class="badge bg-danger cart-badge">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-success text-white ms-2" href="{% url 'signup' %}">Sign Up</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="position-fixed top-0 end-0 h-100 w-100 w-md-50 bg-white shadow-lg d-none" style="z-index: 1050; transform: translateX(100%); transition: transform 0.3s ease;">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="mb-0">🛒 Your Cart</h5>
+            <button class="btn-close" onclick="toggleCart()"></button>
+        </div>
+        <div id="cartContent" class="p-3">
+            <!-- Cart items will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        function toggleCart() {
+            const sidebar = document.getElementById('cartSidebar');
+            sidebar.classList.toggle('d-none');
+            if (!sidebar.classList.contains('d-none')) {
+                loadCart();
+            }
+        }
+
+        async function loadCart() {
+            try {
+                const response = await fetch('/api/cart/');
+                const data = await response.json();
+                if (data.success) {
+                    updateCartUI(data);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        }
+
+        function updateCartUI(data) {
+            const cartContent = document.getElementById('cartContent');
+            const cartBadge = document.getElementById('cartBadge');
+            
+            cartBadge.textContent = data.cart_count || 0;
+            
+            if (data.items.length === 0) {
+                cartContent.innerHTML = '<p class="text-center text-muted">Your cart is empty</p>';
+            } else {
+                cartContent.innerHTML = `
+                    ${data.items.map(item => `
+                        <div class="d-flex align-items-center mb-3 p-2 border rounded">
+                            <img src="${item.image || '/static/placeholder.jpg'}" alt="${item.name}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6>${item.name}</h6>
+                                <p class="mb-1">KES ${item.price} x ${item.quantity}</p>
+                                <small class="text-muted">Subtotal: KES ${item.subtotal}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                <span class="mx-1">${item.quantity}</span>
+                                <button class="btn btn-sm btn-outline-secondary ms-1" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total: KES ${data.total}</strong>
+                        <a href="#" class="btn btn-success" onclick="proceedToCheckout()">Place Order</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Additional cart functions (addToCart, updateQuantity, etc.) can be added here
+        async function addToCart(foodItemId, quantity = 1) {
+            try {
+                const response = await fetch('/api/cart/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({food_item_id: foodItemId, quantity: quantity})
+                });
+                const data = await response.json();
+                if (data.success) {
+                    loadCart();
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showAlert(message, type) {
+            // Simple alert implementation
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function proceedToCheckout() {
+            // Redirect to checkout or show modal
+            window.location.href = '/checkout/';
+        }
+
+        // ==================== THEME MANAGEMENT ====================
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            setTheme(savedTheme, false); // Don't save again
+        });
+
+        function setTheme(theme, save = true) {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (save) {
+                localStorage.setItem('theme', theme);
+            }
+
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                html.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+                themeIcon.className = 'fas fa-adjust';
+            } else {
+                html.setAttribute('data-bs-theme', theme);
+                themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+
+            // Update cart sidebar theme
+            updateCartSidebarTheme(theme);
+        }
+
+        function updateCartSidebarTheme(theme) {
+            const sidebar = document.getElementById('cartSidebar');
+            if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                sidebar.classList.remove('bg-white');
+                sidebar.classList.add('bg-dark', 'text-light');
+            } else {
+                sidebar.classList.remove('bg-dark', 'text-light');
+                sidebar.classList.add('bg-white');
+            }
+        }
+
+        // Listen for system theme changes when in auto mode
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            if (savedTheme === 'auto') {
+                setTheme('auto', false);
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

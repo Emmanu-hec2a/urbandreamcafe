@@ -1,0 +1,394 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Analytics - UrbanFoods Admin{% endblock %}
+
+{% block page_title %}Analytics & Reports{% endblock %}
+
+{% block breadcrumb_active %}Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Analytics & Reports</h1>
+    <div class="d-flex gap-2">
+      <select class="form-select form-select-sm" id="timeRange" onchange="changeTimeRange()" style="width: auto;">
+        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+        <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="exportReport()">
+        <i class="fas fa-download me-1"></i>Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Total Revenue</h6>
+            <h4 class="mb-0 text-success">KES {{ total_revenue|floatformat:2 }}</h4>
+          </div>
+          <i class="fas fa-dollar-sign fa-2x text-success opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Total Orders</h6>
+            <h4 class="mb-0 text-primary">{{ total_orders }}</h4>
+          </div>
+          <i class="fas fa-shopping-cart fa-2x text-primary opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Avg Order Value</h6>
+            <h4 class="mb-0 text-info">KES {{ avg_order_value|floatformat:2 }}</h4>
+          </div>
+          <i class="fas fa-chart-line fa-2x text-info opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Top Item</h6>
+            <h5 class="mb-0 text-warning" id="topItemName">N/A</h5>
+          </div>
+          <i class="fas fa-trophy fa-2x text-warning opacity-75"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Revenue Trend</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Distribution -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Order Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="statusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Items and Customers -->
+<div class="row mb-4">
+    <!-- Top Selling Items -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-fire me-2"></i> Top Selling Items</h5>
+            </div>
+            <div class="card-body">
+                <div id="topItemsList">
+                    <!-- Top items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Customers -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i> Top Customers</h5>
+            </div>
+            <div class="card-body">
+                <div id="topCustomersList">
+                    <!-- Top customers will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Peak Hours -->
+<div class="admin-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Peak Order Hours</h5>
+    </div>
+    <div class="card-body">
+        <div class="chart-container">
+            <canvas id="peakHoursChart" height="200"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let revenueChart, statusChart, peakHoursChart;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Parse data
+    const revenueData = JSON.parse('{{ daily_revenue|escapejs }}');
+    const statusData = JSON.parse('{{ status_distribution|escapejs }}');
+    const peakHoursData = JSON.parse('{{ peak_hours|escapejs }}');
+    const topItemsData = JSON.parse('{{ top_items|escapejs }}');
+    const topCustomersData = JSON.parse('{{ top_customers|escapejs }}');
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(item => {
+                const date = new Date(item.day);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [{
+                label: 'Revenue (KES)',
+                data: revenueData.map(item => item.revenue),
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Orders',
+                data: revenueData.map(item => item.orders),
+                borderColor: '#764ba2',
+                backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+
+    const statusColors = {
+        'pending': '#ffc107',
+        'confirmed': '#17a2b8',
+        'preparing': '#fd7e14',
+        'ready': '#20c997',
+        'out_for_delivery': '#007bff',
+        'delivered': '#28a745',
+        'cancelled': '#dc3545'
+    };
+
+    statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(item => item.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())),
+            datasets: [{
+                data: statusData.map(item => item.count),
+                backgroundColor: statusData.map(item => statusColors[item.status] || '#6c757d'),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Peak Hours Chart
+    const peakHoursCtx = document.getElementById('peakHoursChart').getContext('2d');
+
+    peakHoursChart = new Chart(peakHoursCtx, {
+        type: 'bar',
+        data: {
+            labels: peakHoursData.map(item => `${item.hour}:00`),
+            datasets: [{
+                label: 'Orders',
+                data: peakHoursData.map(item => item.order_count),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Set top item name in metrics card
+    const topItemName = document.getElementById('topItemName');
+    if (topItemsData.length > 0) {
+        topItemName.textContent = topItemsData[0].food_item__name;
+    } else {
+        topItemName.textContent = 'N/A';
+    }
+
+    // Populate Top Items List
+    const topItemsList = document.getElementById('topItemsList');
+    if (topItemsData.length > 0) {
+        topItemsData.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'd-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded';
+            itemDiv.innerHTML = `
+                <div>
+                    <h6 class="mb-1">${item.food_item__name}</h6>
+                    <small class="text-muted">${item.food_item__category__name}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary">${item.total_quantity} sold</span>
+                    <br>
+                    <small class="text-success fw-bold">KES ${parseFloat(item.total_revenue).toFixed(0)}</small>
+                </div>
+            `;
+            topItemsList.appendChild(itemDiv);
+        });
+    } else {
+        topItemsList.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No sales data available</p>
+            </div>
+        `;
+    }
+
+    // Populate Top Customers List
+    const topCustomersList = document.getElementById('topCustomersList');
+    if (topCustomersData.length > 0) {
+        topCustomersData.forEach(customer => {
+            const customerDiv = document.createElement('div');
+            customerDiv.className = 'd-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded';
+            customerDiv.innerHTML = `
+                <div>
+                    <h6 class="mb-1">${customer.user__username}</h6>
+                    <small class="text-muted">${customer.user__phone_number}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success">${customer.total_orders} orders</span>
+                    <br>
+                    <small class="text-primary fw-bold">KES ${parseFloat(customer.total_spent).toFixed(0)}</small>
+                </div>
+            `;
+            topCustomersList.appendChild(customerDiv);
+        });
+    } else {
+        topCustomersList.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No customer data available</p>
+            </div>
+        `;
+    }
+}
+
+function changeTimeRange() {
+    const days = document.getElementById('timeRange').value;
+    window.location.href = `?days=${days}`;
+}
+
+function exportReport() {
+    const days = document.getElementById('timeRange').value;
+
+    // Create a simple CSV export
+    const data = {
+        daily_revenue: JSON.parse('{{ daily_revenue|escapejs }}'),
+        top_items: JSON.parse('{{ top_items|escapejs }}'),
+        top_customers: JSON.parse('{{ top_customers|escapejs }}'),
+        status_distribution: JSON.parse('{{ status_distribution|escapejs }}')
+    };
+
+    let csv = 'Date,Revenue,Orders\n';
+    data.daily_revenue.forEach(item => {
+        csv += `${item.day},${item.revenue},${item.orders}\n`;
+    });
+
+    csv += '\nTop Items\nName,Category,Quantity,Revenue\n';
+    data.top_items.forEach(item => {
+        csv += `${item.food_item__name},${item.food_item__category__name},${item.total_quantity},${item.total_revenue}\n`;
+    });
+
+    csv += '\nTop Customers\nUsername,Phone,Orders,Total Spent\n';
+    data.top_customers.forEach(customer => {
+        csv += `${customer.user__username},${customer.user__phone_number},${customer.total_orders},${customer.total_spent}\n`;
+    });
+
+    // Download CSV
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `urbanfoods-analytics-${days}days.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    showAlert('Report exported successfully!', 'success');
+}
+</script>
+{% endblock %}
