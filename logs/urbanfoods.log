@@ -45361,3 +45361,68 @@ Watching for file changes with StatReloader
 "GET /login/ HTTP/1.1" 200 5419
 "GET / HTTP/1.1" 200 86684
 "GET /static/images/favicon.png HTTP/1.1" 304 0
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 86684
+"GET /media/food_images/chipo_sypaKSA.jpg HTTP/1.1" 200 36594
+"GET /media/food_images/chBeans_UygQcMz.jpeg HTTP/1.1" 200 9535
+"GET /static/styles.css HTTP/1.1" 200 8080
+"GET /media/food_images/chipskuku_ffz8Rhc.jpeg HTTP/1.1" 200 11177
+"GET /media/food_images/chicken_APd4w6i.jpeg HTTP/1.1" 200 14164
+"GET /media/food_images/boilo_a0x4rAo.jpeg HTTP/1.1" 200 7895
+"GET /media/food_images/chapo_pjX6yyu.jpeg HTTP/1.1" 200 8419
+"GET /media/food_images/chMasala_5pcmlgI.jpeg HTTP/1.1" 200 10387
+"GET /media/food_images/pilau_MNlmfR1.jpeg HTTP/1.1" 200 11279
+"GET /media/food_images/chBeef_C61MTe9.jpeg HTTP/1.1" 200 13441
+"GET /media/food_images/chMatumbo_Wkgjo3p.jpeg HTTP/1.1" 200 8558
+"GET /media/food_images/rcBeans_Y7WXf9W.jpeg HTTP/1.1" 200 8588
+"GET /media/food_images/ugAnGreens_SJT0a7P.jpeg HTTP/1.1" 200 12098
+"GET /media/food_images/ugbeef_j98VPJf.jpeg HTTP/1.1" 200 7565
+"GET /media/food_images/ugManagu_RUiWoKQ.jpeg HTTP/1.1" 200 9270
+"GET /media/food_images/ugmala_DPRfFFt.jpeg HTTP/1.1" 200 4939
+"GET /media/food_images/ugMatumbo_2sJlFBi.jpeg HTTP/1.1" 200 15335
+"GET /media/food_images/ugMayai_DafUhV2.jpeg HTTP/1.1" 200 15794
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET / HTTP/1.1" 200 86684
+"GET /signup/ HTTP/1.1" 200 7030
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+Forbidden (CSRF cookie not set.): /signup/
+"POST /signup/ HTTP/1.1" 403 2870
+Forbidden (CSRF cookie not set.): /signup/
+"POST /signup/ HTTP/1.1" 403 2870
+Forbidden (CSRF cookie not set.): /signup/
+"POST /signup/ HTTP/1.1" 403 2870
+Forbidden (CSRF cookie not set.): /signup/
+"POST /signup/ HTTP/1.1" 403 2870
+Forbidden (CSRF cookie not set.): /signup/
+"POST /signup/ HTTP/1.1" 403 2870
+"GET /login/ HTTP/1.1" 200 5419
+"POST /login/ HTTP/1.1" 200 61
+"GET /signup/ HTTP/1.1" 200 7030
+"GET / HTTP/1.1" 200 86684
+"GET /static/styles.css HTTP/1.1" 200 8080
+"GET /media/food_images/chBeans_UygQcMz.jpeg HTTP/1.1" 200 9535
+"GET /media/food_images/chipo_sypaKSA.jpg HTTP/1.1" 200 36594
+"GET /media/food_images/chipskuku_ffz8Rhc.jpeg HTTP/1.1" 200 11177
+"GET /media/food_images/chicken_APd4w6i.jpeg HTTP/1.1" 200 14164
+"GET /media/food_images/boilo_a0x4rAo.jpeg HTTP/1.1" 200 7895
+"GET /media/food_images/chapo_pjX6yyu.jpeg HTTP/1.1" 200 8419
+"GET /media/food_images/chMasala_5pcmlgI.jpeg HTTP/1.1" 200 10387
+"GET /media/food_images/pilau_MNlmfR1.jpeg HTTP/1.1" 200 11279
+"GET /media/food_images/chBeef_C61MTe9.jpeg HTTP/1.1" 200 13441
+"GET /media/food_images/chMatumbo_Wkgjo3p.jpeg HTTP/1.1" 200 8558
+"GET /media/food_images/rcBeans_Y7WXf9W.jpeg HTTP/1.1" 200 8588
+"GET /media/food_images/ugAnGreens_SJT0a7P.jpeg HTTP/1.1" 200 12098
+"GET /media/food_images/ugbeef_j98VPJf.jpeg HTTP/1.1" 200 7565
+"GET /media/food_images/ugManagu_RUiWoKQ.jpeg HTTP/1.1" 200 9270
+"GET /media/food_images/ugmala_DPRfFFt.jpeg HTTP/1.1" 200 4939
+"GET /media/food_images/ugMatumbo_2sJlFBi.jpeg HTTP/1.1" 200 15335
+"GET /media/food_images/ugMayai_DafUhV2.jpeg HTTP/1.1" 200 15794
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /login/ HTTP/1.1" 200 5419
+"POST /login/ HTTP/1.1" 200 61
+"POST /login/ HTTP/1.1" 200 61
+"GET /signup/ HTTP/1.1" 200 7030
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
