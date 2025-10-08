@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from urbanfoods import views, admin_views
 from django.conf import settings
+from django.views.generic import RedirectView
+from django.templatetags.static import static as static_url
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -74,6 +76,10 @@ urlpatterns = [
     
     # Reviews management
     path('orders/<str:order_number>/submit_review/', views.submit_food_review, name='submit_food_review'),
+
+    # Favicon
+    path('favicon.ico', RedirectView.as_view(url=static_url('images/favicon.png'), permanent=True)),
+
 ]
 
 if settings.DEBUG:
