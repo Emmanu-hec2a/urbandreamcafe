@@ -18,6 +18,7 @@
 
         <!-- Signup Form -->
         <form id="signupForm" class="space-y-4">
+            {% csrf_token %}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                 <input 

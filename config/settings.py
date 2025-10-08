@@ -24,6 +24,7 @@ ALLOWED_HOSTS = ['192.168.48.227', 'localhost', '127.0.0.1', '*']
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5050",
+    'https://urbandreamcafe.up.railway.app',
     "http://localhost:5050",
     "http://192.168.48.227:5050",
 ]
