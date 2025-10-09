@@ -1,17 +1,18 @@
-const CACHE_NAME = "urbanfoods-cache-v1";
+const CACHE_NAME = "urbanfoods-cache-v2";
 const urlsToCache = [
-  "/", 
-  "/static/css/style.css",
+  "/",
+  "/static/styles.css",
   "/static/js/order_detail.js",
   "/static/js/homepage.js",
   "/static/images/favicon.png",
-    "/static/images/bg.jpeg",
-    "/static/images/bg-pattern.jpg",
-    '/static/manifest.json'
+  "/static/images/bg.jpeg",
+  "/static/images/bg-pattern.jpg",
+  "/static/manifest.json"
 ];
 
 // Install service worker
 self.addEventListener("install", (event) => {
+  self.skipWaiting(); // Activate immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("Opened cache");
@@ -20,16 +21,24 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Fetch from cache if available
+// Fetch from cache if available, with offline fallback
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).catch(() => {
+        // Offline fallback: return cached homepage for navigation requests
+        if (event.request.mode === 'navigate') {
+          return caches.match('/');
+        }
+      });
     })
   );
 });
 
-// Update service worker
+// Update service worker and claim clients
 self.addEventListener("activate", (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -41,6 +50,8 @@ self.addEventListener("activate", (event) => {
           }
         })
       )
-    )
+    ).then(() => {
+      return self.clients.claim(); // Take control of all open clients
+    })
   );
 });

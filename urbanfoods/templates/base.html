@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}UrbanFoods - Campus Food Delivery{% endblock %}</title>
+    <title>{% block title %}UrbanDreamsCafe{% endblock %}</title>
 
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#ff6600">
@@ -280,6 +280,46 @@
             .then(reg => console.log("Service Worker registered!", reg))
             .catch(err => console.error("Service Worker registration failed:", err));
         }
+    </script>
+    <script>
+        let deferredPrompt;
+        const installBtn = document.createElement('button');
+        installBtn.textContent = 'Install App';
+        installBtn.style.position = 'fixed';
+        installBtn.style.bottom = '20px';
+        installBtn.style.right = '20px';
+        installBtn.style.padding = '10px 20px';
+        installBtn.style.backgroundColor = '#ff6600';
+        installBtn.style.color = 'white';
+        installBtn.style.border = 'none';
+        installBtn.style.borderRadius = '5px';
+        installBtn.style.cursor = 'pointer';
+        installBtn.style.display = 'none';
+        document.body.appendChild(installBtn);
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installBtn.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

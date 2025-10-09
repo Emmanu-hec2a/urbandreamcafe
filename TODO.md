@@ -1,13 +1,6 @@
-# TODO: Add Food Item Ratings Display on Homepage
+# PWA Installation Enablement Tasks
 
-## Tasks
-- [ ] Update homepage.html template to display star ratings for each food item
-- [ ] Add CSS styling for star rating display
-- [ ] Include review count alongside ratings
-- [ ] Test rating display for items with and without reviews
-
-## Implementation Details
-- Use FoodItem.average_rating property (calculated from FoodReview model)
-- Display stars using Font Awesome icons
-- Show rating out of 5 with number of reviews
-- Position ratings between item description and price/add button
+- [x] Update urbanfoods/static/manifest.json to add "scope" and "orientation" fields, and ensure icon paths are correct.
+- [x] Update urbanfoods/static/service-worker.js to improve cache versioning, add offline fallback page caching, and add event listener for offline fallback.
+- [x] Add JavaScript in base.html to handle PWA installation prompt popup.
+- [ ] Test PWA installation on a browser after updates.
