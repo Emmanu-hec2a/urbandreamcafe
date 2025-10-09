@@ -18,7 +18,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     
-    # ==================== CART & ORDERS ====================
+    # ==================== CART & ORDERS ================
     # Cart operations
     path('api/cart/', views.get_cart, name='get_cart'),
     path('api/cart/add/', views.add_to_cart, name='add_to_cart'),
