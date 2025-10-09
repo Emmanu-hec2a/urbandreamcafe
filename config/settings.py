@@ -31,7 +31,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
-    #  'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -129,8 +129,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SESSION_COOKIE_AGE = 604800  # 1 week
 SESSION_SAVE_EVERY_REQUEST = True
 
-# Email Configuration (for password reset)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Development
+# Email Configuration (for password reset)  Development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
 # For production:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'
