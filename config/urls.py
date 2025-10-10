@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # Comment out or remove the default Django admin URL to disable access
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     # path(' ', include('urbanfoods.urls')),
     # ==================== PUBLIC PAGES ====================
     path('', views.homepage, name='homepage'),
