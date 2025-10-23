@@ -2,11 +2,12 @@
 
 import os
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'CkjROe1297NYoJ2iKGEfoSVbKcNRwkkS_CsQQgLGyuRLsfbD8cvUPCZM2srW04goB1Q')
 
 # settings.py
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # default
@@ -18,9 +19,9 @@ ADMIN_SESSION_COOKIE_NAME = "admin_sessionid"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['192.168.48.227', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['192.168.48.227', 'localhost', '127.0.0.1', 'urbandreamcafe.up.railway.app', '*']
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5050",
@@ -73,22 +74,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database Configuration
+# Use PostgreSQL from Railway if DATABASE_URL exists, otherwise SQLite for local dev
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-    # For production, use PostgreSQL:
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.environ.get('DB_NAME'),
-    #     'USER': os.environ.get('DB_USER'),
-    #     'PASSWORD': os.environ.get('DB_PASSWORD'),
-    #     'HOST': os.environ.get('DB_HOST', 'localhost'),
-    #     'PORT': os.environ.get('DB_PORT', '5432'),
-    # }
-}
+else:
+    # Local development fallback
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Custom User Model
 AUTH_USER_MODEL = 'urbanfoods.User'
