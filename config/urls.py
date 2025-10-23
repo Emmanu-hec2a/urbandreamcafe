@@ -6,10 +6,20 @@ from django.views.generic import RedirectView
 from django.templatetags.static import static as static_url
 from django.conf.urls.static import static
 
+# Customize Django Admin site branding
+admin.site.site_header = "UrbanDream Backend"
+admin.site.site_title = "UrbanDream Database Admin"
+admin.site.index_title = "Database Management"
+
 urlpatterns = [
-    # Comment out or remove the default Django admin URL to disable access
-    # path('admin/', admin.site.urls),
-    # path(' ', include('urbanfoods.urls')),
+    # ==================== ADMIN PANELS ====================
+    # Django's built-in admin (for database management)
+    path('backend/', admin.site.urls),
+    
+    # Custom admin panel (for operations)
+    path('admin-panel/login/', admin_views.admin_login, name='admin_login'),
+    path('admin-panel/', admin_views.admin_dashboard, name='admin_dashboard'),
+    
     # ==================== PUBLIC PAGES ====================
     path('', views.homepage, name='homepage'),
     
@@ -37,10 +47,7 @@ urlpatterns = [
     path('orders/<str:order_number>/rate/', views.rate_order, name='rate_order'),
     path('profile/', views.profile, name='profile'),
     
-    # ==================== ADMIN DASHBOARD ====================
-    path('admin-panel/login/', admin_views.admin_login, name='admin_login'),
-    path('admin-panel/', admin_views.admin_dashboard, name='admin_dashboard'),
-    
+    # ==================== CUSTOM ADMIN DASHBOARD ====================
     # Order management
     path('admin-panel/orders/', admin_views.admin_orders, name='admin_orders'),
     path('admin-panel/orders/<str:order_number>/', admin_views.admin_order_detail, name='admin_order_detail'),

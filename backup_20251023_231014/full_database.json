@@ -1,0 +1,1032 @@
+[
+{
+  "model": "urbanfoods.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$9RpNk0I2ZJDr4eSJhiBgG0$0lUiZ7h1pZEteoYyPcmMr4DfJgnibyeux9BqAuCdb5U=",
+    "last_login": "2025-10-23T19:13:52.141Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-03T12:15:53Z",
+    "phone_number": "",
+    "default_hostel": "",
+    "default_room": "",
+    "student_email": null,
+    "loyalty_points": 300,
+    "is_verified": true,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "urbanfoods.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$9XanFsVTieX51exlcpJEwq$u1ys1I72uuxjSjCnFQXMuji+WLc/etOgv2lMm6qtltI=",
+    "last_login": "2025-10-03T18:07:13Z",
+    "is_superuser": true,
+    "username": "mose",
+    "first_name": "",
+    "last_name": "",
+    "email": "atindamoses@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-03T18:07:12Z",
+    "phone_number": "0790336262",
+    "default_hostel": "",
+    "default_room": "",
+    "student_email": null,
+    "loyalty_points": 0,
+    "is_verified": true,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "urbanfoods.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$GPbHK6MSn2ppg3UfObfKgA$qG+tmmSUjer2ZufHIgNls5h2KADxbtWZBwiht1vAd58=",
+    "last_login": "2025-10-09T16:59:55Z",
+    "is_superuser": true,
+    "username": "urbandreamscafe2",
+    "first_name": "",
+    "last_name": "",
+    "email": "atindamoses@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-09T16:46:37Z",
+    "phone_number": "",
+    "default_hostel": "",
+    "default_room": "",
+    "student_email": null,
+    "loyalty_points": 0,
+    "is_verified": true,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 1,
+  "fields": {
+    "name": "Snacks",
+    "description": "Snacks",
+    "icon": "",
+    "order": 234
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Foods",
+    "description": "Foods",
+    "icon": "",
+    "order": 789
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 3,
+  "fields": {
+    "name": "Combo Meals",
+    "description": "Combo Meals",
+    "icon": "",
+    "order": 1129
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 4,
+  "fields": {
+    "name": "Drinks",
+    "description": "",
+    "icon": "",
+    "order": 0
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 1,
+  "fields": {
+    "name": "Chips + Kuku",
+    "description": "Chips kuku",
+    "category": 1,
+    "price": "150.00",
+    "image": "food_images/chipskuku_ffz8Rhc.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T12:19:26.488Z",
+    "updated_at": "2025-10-05T10:07:36.838Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 2,
+  "fields": {
+    "name": "Chipo Mwitu",
+    "description": "Golden fried chipo mwitu, served with kachumbari, simple crispy, and tasty.",
+    "category": 1,
+    "price": "70.00",
+    "image": "food_images/chipo_sypaKSA.jpg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 3,
+    "created_at": "2025-10-03T13:53:27.208Z",
+    "updated_at": "2025-10-05T10:07:36.865Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 3,
+  "fields": {
+    "name": "Chapo Beans",
+    "description": "Fluffy soft chapati with thick brown beans stew.",
+    "category": 3,
+    "price": "50.00",
+    "image": "food_images/chBeans_UygQcMz.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 7,
+    "created_at": "2025-10-03T13:55:11.654Z",
+    "updated_at": "2025-10-05T10:05:56.673Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 4,
+  "fields": {
+    "name": "Ugali Beef",
+    "description": "A classic ugali served with tender beef stew.",
+    "category": 3,
+    "price": "120.00",
+    "image": "food_images/ugbeef_j98VPJf.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T13:57:57.262Z",
+    "updated_at": "2025-10-03T13:57:57.262Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 5,
+  "fields": {
+    "name": "Chips Masala",
+    "description": "Fried chips tossed in onions, tomatoes, capsicum, and flavorful masala spices.",
+    "category": 1,
+    "price": "130.00",
+    "image": "food_images/chMasala_5pcmlgI.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T13:59:19.202Z",
+    "updated_at": "2025-10-03T19:04:39.302Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 6,
+  "fields": {
+    "name": "Ugali + Any greens",
+    "description": "Plain ugali paired with your choice of available vegetables (sukuma, spinach, or managu).",
+    "category": 3,
+    "price": "50.00",
+    "image": "food_images/ugAnGreens_SJT0a7P.jpeg",
+    "prep_time": 10,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:00:38.399Z",
+    "updated_at": "2025-10-03T14:00:38.399Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 7,
+  "fields": {
+    "name": "Rice Beans/Ndengu",
+    "description": "Steamed white rice served with your choice of either beans or green grams (ndengu).",
+    "category": 3,
+    "price": "70.00",
+    "image": "food_images/rcBeans_Y7WXf9W.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:01:44.731Z",
+    "updated_at": "2025-10-03T14:01:44.731Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 8,
+  "fields": {
+    "name": "Ugali Matumbo",
+    "description": "Firm ugali served with flavorful beef tripe stew. Affordable and protein-rich.",
+    "category": 3,
+    "price": "100.00",
+    "image": "food_images/ugMatumbo_2sJlFBi.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:02:41.303Z",
+    "updated_at": "2025-10-03T14:02:41.303Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 9,
+  "fields": {
+    "name": "Chapo",
+    "description": "Fluffy soft chapa-i.",
+    "category": 2,
+    "price": "20.00",
+    "image": "food_images/chapo_pjX6yyu.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 5,
+    "created_at": "2025-10-03T14:03:56.999Z",
+    "updated_at": "2025-10-05T09:50:14.639Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 10,
+  "fields": {
+    "name": "Ugali Mayai",
+    "description": "Freshly cooked ugali served with either fried eggs or sliced boiled eggs.",
+    "category": 3,
+    "price": "90.00",
+    "image": "food_images/ugMayai_DafUhV2.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:04:36.485Z",
+    "updated_at": "2025-10-03T14:04:36.485Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 11,
+  "fields": {
+    "name": "Chapo Matumbo",
+    "description": "Soft chapatis served with well-seasoned beef tripe stew (matumbo).",
+    "category": 3,
+    "price": "90.00",
+    "image": "food_images/chMatumbo_Wkgjo3p.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:05:45.524Z",
+    "updated_at": "2025-10-03T14:05:45.524Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 12,
+  "fields": {
+    "name": "Boiled Eggs (Pasua)",
+    "description": "A boiled egg topped with a bit of spicy kachumbari (tomato–onion salad).",
+    "category": 2,
+    "price": "25.00",
+    "image": "food_images/boilo_a0x4rAo.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 5,
+    "created_at": "2025-10-03T14:07:27.129Z",
+    "updated_at": "2025-10-03T18:27:54.326Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 13,
+  "fields": {
+    "name": "Pilau",
+    "description": "Rice cooked with aromatic pilau spices like cinnamon, cloves, cardamom, and ginger, often served with meat or plain.",
+    "category": 2,
+    "price": "100.00",
+    "image": "food_images/pilau_MNlmfR1.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T14:08:46.458Z",
+    "updated_at": "2025-10-03T19:04:39.290Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 14,
+  "fields": {
+    "name": "Ugali Mala",
+    "description": "Combo of ugali paired with sour fermented mala.",
+    "category": 3,
+    "price": "70.00",
+    "image": "food_images/ugmala_DPRfFFt.jpeg",
+    "prep_time": 10,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:10:06.554Z",
+    "updated_at": "2025-10-03T14:10:06.554Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 15,
+  "fields": {
+    "name": "Kuku Special",
+    "description": "Tender chicken (fried, stewed, or grilled), seasoned with local spices, served hot with kachumbari and a choice of ugali or chapati",
+    "category": 2,
+    "price": "100.00",
+    "image": "food_images/chicken_APd4w6i.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 1,
+    "created_at": "2025-10-03T14:11:09.485Z",
+    "updated_at": "2025-10-03T18:23:13.957Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 16,
+  "fields": {
+    "name": "Chapo Beef",
+    "description": "Fluffy chapatis with rich beef stew. A filling, tasty classic.",
+    "category": 3,
+    "price": "110.00",
+    "image": "food_images/chBeef_C61MTe9.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:12:29.995Z",
+    "updated_at": "2025-10-03T14:12:29.995Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 17,
+  "fields": {
+    "name": "Ugali Kienyeji",
+    "description": "Ugali with nutritious mboga kienyeji (managu), healthy and affordable.",
+    "category": 3,
+    "price": "80.00",
+    "image": "food_images/ugManagu_RUiWoKQ.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:14:09.224Z",
+    "updated_at": "2025-10-03T14:14:09.224Z"
+  }
+},
+{
+  "model": "urbanfoods.cart",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "mose"
+    ],
+    "created_at": "2025-10-03T18:07:14.910Z",
+    "updated_at": "2025-10-03T18:07:14.910Z"
+  }
+},
+{
+  "model": "urbanfoods.cart",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "created_at": "2025-10-03T18:10:59.021Z",
+    "updated_at": "2025-10-03T18:10:59.021Z"
+  }
+},
+{
+  "model": "urbanfoods.promotion",
+  "pk": 2,
+  "fields": {
+    "title": "Kuku Special",
+    "description": "Kuku",
+    "code": "",
+    "discount_percentage": null,
+    "discount_amount": null,
+    "min_order_amount": "0.00",
+    "is_active": true,
+    "start_date": "2025-10-03T17:48:03Z",
+    "end_date": "2025-10-03T17:50:10Z",
+    "usage_limit": null,
+    "times_used": 0
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2025-10-03T12:18:44.801Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodcategory"
+    ],
+    "object_id": "1",
+    "object_repr": "snacks",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2025-10-03T12:19:26.491Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "1",
+    "object_repr": "Chips + Kuku - KES 150",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2025-10-03T12:20:20.351Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "1",
+    "object_repr": "Order UF2025100376DDA8 - Ethan",
+    "action_flag": 2,
+    "change_message": "[]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2025-10-03T12:20:51.988Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "Ethan",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is verified\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2025-10-03T12:21:04.866Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "user"
+    ],
+    "object_id": "1",
+    "object_repr": "admin",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is verified\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2025-10-03T12:21:40.094Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "1",
+    "object_repr": "Order UF2025100376DDA8 - Ethan",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2025-10-03T12:47:31.755Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "2",
+    "object_repr": "Order UF202510039E2788 - Ethan",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2025-10-03T12:59:36.605Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "3",
+    "object_repr": "Order UF20251003311C96 - Ethan",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2025-10-03T13:46:02.265Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodcategory"
+    ],
+    "object_id": "2",
+    "object_repr": "Foods",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2025-10-03T13:47:04.803Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodcategory"
+    ],
+    "object_id": "3",
+    "object_repr": "Combo Meals",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2025-10-03T13:47:31.950Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodcategory"
+    ],
+    "object_id": "1",
+    "object_repr": "Snacks",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Name\", \"Description\", \"Order\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2025-10-03T13:48:03.954Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "1",
+    "object_repr": "Chips + Kuku - KES 150.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Times ordered\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 13,
+  "fields": {
+    "action_time": "2025-10-03T14:17:35.288Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "1",
+    "object_repr": "Chips + Kuku - KES 150.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Times ordered\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 14,
+  "fields": {
+    "action_time": "2025-10-03T14:18:31.607Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodreview"
+    ],
+    "object_id": "1",
+    "object_repr": "Ethan - Chips + Kuku (5★)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 15,
+  "fields": {
+    "action_time": "2025-10-03T14:18:31.614Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodreview"
+    ],
+    "object_id": "2",
+    "object_repr": "Ethan - Chips + Kuku (4★)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 16,
+  "fields": {
+    "action_time": "2025-10-03T14:18:31.620Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodreview"
+    ],
+    "object_id": "3",
+    "object_repr": "Ethan - Chips + Kuku (3★)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 17,
+  "fields": {
+    "action_time": "2025-10-03T14:18:51.101Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "3",
+    "object_repr": "Order UF20251003311C96 - Ethan",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 18,
+  "fields": {
+    "action_time": "2025-10-03T14:18:51.107Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "2",
+    "object_repr": "Order UF202510039E2788 - Ethan",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 19,
+  "fields": {
+    "action_time": "2025-10-03T14:18:51.113Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "1",
+    "object_repr": "Order UF2025100376DDA8 - Ethan",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 20,
+  "fields": {
+    "action_time": "2025-10-03T17:42:03.247Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "promotion"
+    ],
+    "object_id": "1",
+    "object_repr": "Kuku Special",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 21,
+  "fields": {
+    "action_time": "2025-10-03T17:45:21.720Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "promotion"
+    ],
+    "object_id": "1",
+    "object_repr": "Kuku Special",
+    "action_flag": 2,
+    "change_message": "[]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 22,
+  "fields": {
+    "action_time": "2025-10-03T17:47:37.993Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "promotion"
+    ],
+    "object_id": "1",
+    "object_repr": "Kuku Special",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 23,
+  "fields": {
+    "action_time": "2025-10-03T17:48:18.626Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "promotion"
+    ],
+    "object_id": "2",
+    "object_repr": "Kuku Special",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 24,
+  "fields": {
+    "action_time": "2025-10-03T18:23:13.955Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "3",
+    "object_repr": "Chapo Beans - KES 50.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is featured\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 25,
+  "fields": {
+    "action_time": "2025-10-03T18:23:13.957Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "1",
+    "object_repr": "Chips + Kuku - KES 150.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is featured\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 26,
+  "fields": {
+    "action_time": "2025-10-03T18:23:13.958Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "15",
+    "object_repr": "Kuku Special - KES 100.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is featured\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 27,
+  "fields": {
+    "action_time": "2025-10-03T18:24:39.321Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "fooditem"
+    ],
+    "object_id": "2",
+    "object_repr": "Chipo Mwitu - KES 70.00",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is featured\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 28,
+  "fields": {
+    "action_time": "2025-10-09T07:47:25.673Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "user"
+    ],
+    "object_id": "3",
+    "object_repr": "mose",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Staff status\", \"Superuser status\", \"Is verified\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 29,
+  "fields": {
+    "action_time": "2025-10-09T07:47:42.661Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "Ethan",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 30,
+  "fields": {
+    "action_time": "2025-10-09T07:48:02.178Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "order"
+    ],
+    "object_id": "10",
+    "object_repr": "Order UF202510033A4F9F - admin",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 31,
+  "fields": {
+    "action_time": "2025-10-09T17:03:38.408Z",
+    "user": [
+      "urbandreamscafe2"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "user"
+    ],
+    "object_id": "4",
+    "object_repr": "urbandreamscafe2",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Is verified\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 32,
+  "fields": {
+    "action_time": "2025-10-23T09:02:10.945Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "urbanfoods",
+      "foodcategory"
+    ],
+    "object_id": "4",
+    "object_repr": "Drinks",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+}
+]

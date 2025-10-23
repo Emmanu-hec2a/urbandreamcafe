@@ -44,7 +44,7 @@ def admin_login(request):
                     'message': 'Invalid admin credentials or insufficient permissions'
                 })
 
-    return render(request, 'admin/login.html')
+    return render(request, 'custom_admin/login.html')
 
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
@@ -135,7 +135,7 @@ def admin_dashboard(request):
         'revenue_trend': list(revenue_trend),
     }
 
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'custom_admin/dashboard.html', context)
 
 @staff_member_required(login_url='admin_login')
 def admin_dashboard_stats(request):
@@ -204,7 +204,7 @@ def admin_orders(request):
         'status_filter': status_filter,
     }
 
-    return render(request, 'admin/orders.html', context)
+    return render(request, 'custom_admin/orders.html', context)
 
 @staff_member_required(login_url='admin_login')
 def get_new_orders(request):
@@ -260,7 +260,7 @@ def admin_order_detail(request, order_number):
         'status_history': status_history,
     }
 
-    return render(request, 'admin/order_detail.html', context)
+    return render(request, 'custom_admin/order_detail.html', context)
 
 @staff_member_required(login_url='admin_login')
 def update_order_status(request):
@@ -339,7 +339,7 @@ def admin_menu(request):
         'food_items': food_items,
     }
 
-    return render(request, 'admin/menu.html', context)
+    return render(request, 'custom_admin/menu.html', context)
 
 @staff_member_required(login_url='admin_login')
 def toggle_food_availability(request):
@@ -624,7 +624,7 @@ def admin_analytics(request):
         'peak_hours': json.dumps(list(peak_hours), default=str),
     }
 
-    return render(request, 'admin/analytics.html', context)
+    return render(request, 'custom_admin/analytics.html', context)
 
 # ==================== CUSTOMER MANAGEMENT ====================
 
@@ -647,7 +647,7 @@ def admin_customers(request):
         'avg_orders_per_customer': avg_orders_per_customer,
     }
 
-    return render(request, 'admin/customers.html', context)
+    return render(request, 'custom_admin/customers.html', context)
 
 @staff_member_required(login_url='admin_login')
 def admin_customer_detail(request, customer_id):
@@ -659,7 +659,7 @@ def admin_customer_detail(request, customer_id):
         'customer': customer,
         'orders': orders,
     }
-    return render(request, 'admin/customer_detail.html', context)
+    return render(request, 'custom_admin/customer_detail.html', context)
 
 @staff_member_required(login_url='admin_login')
 def get_customer_orders(request, customer_id):

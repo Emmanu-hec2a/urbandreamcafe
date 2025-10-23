@@ -1,0 +1,348 @@
+[
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 1,
+  "fields": {
+    "name": "Snacks",
+    "description": "Snacks",
+    "icon": "",
+    "order": 234
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Foods",
+    "description": "Foods",
+    "icon": "",
+    "order": 789
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 3,
+  "fields": {
+    "name": "Combo Meals",
+    "description": "Combo Meals",
+    "icon": "",
+    "order": 1129
+  }
+},
+{
+  "model": "urbanfoods.foodcategory",
+  "pk": 4,
+  "fields": {
+    "name": "Drinks",
+    "description": "",
+    "icon": "",
+    "order": 0
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 1,
+  "fields": {
+    "name": "Chips + Kuku",
+    "description": "Chips kuku",
+    "category": 1,
+    "price": "150.00",
+    "image": "food_images/chipskuku_ffz8Rhc.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T12:19:26.488Z",
+    "updated_at": "2025-10-05T10:07:36.838Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 2,
+  "fields": {
+    "name": "Chipo Mwitu",
+    "description": "Golden fried chipo mwitu, served with kachumbari, simple crispy, and tasty.",
+    "category": 1,
+    "price": "70.00",
+    "image": "food_images/chipo_sypaKSA.jpg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 3,
+    "created_at": "2025-10-03T13:53:27.208Z",
+    "updated_at": "2025-10-05T10:07:36.865Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 3,
+  "fields": {
+    "name": "Chapo Beans",
+    "description": "Fluffy soft chapati with thick brown beans stew.",
+    "category": 3,
+    "price": "50.00",
+    "image": "food_images/chBeans_UygQcMz.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 7,
+    "created_at": "2025-10-03T13:55:11.654Z",
+    "updated_at": "2025-10-05T10:05:56.673Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 4,
+  "fields": {
+    "name": "Ugali Beef",
+    "description": "A classic ugali served with tender beef stew.",
+    "category": 3,
+    "price": "120.00",
+    "image": "food_images/ugbeef_j98VPJf.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T13:57:57.262Z",
+    "updated_at": "2025-10-03T13:57:57.262Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 5,
+  "fields": {
+    "name": "Chips Masala",
+    "description": "Fried chips tossed in onions, tomatoes, capsicum, and flavorful masala spices.",
+    "category": 1,
+    "price": "130.00",
+    "image": "food_images/chMasala_5pcmlgI.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T13:59:19.202Z",
+    "updated_at": "2025-10-03T19:04:39.302Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 6,
+  "fields": {
+    "name": "Ugali + Any greens",
+    "description": "Plain ugali paired with your choice of available vegetables (sukuma, spinach, or managu).",
+    "category": 3,
+    "price": "50.00",
+    "image": "food_images/ugAnGreens_SJT0a7P.jpeg",
+    "prep_time": 10,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:00:38.399Z",
+    "updated_at": "2025-10-03T14:00:38.399Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 7,
+  "fields": {
+    "name": "Rice Beans/Ndengu",
+    "description": "Steamed white rice served with your choice of either beans or green grams (ndengu).",
+    "category": 3,
+    "price": "70.00",
+    "image": "food_images/rcBeans_Y7WXf9W.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:01:44.731Z",
+    "updated_at": "2025-10-03T14:01:44.731Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 8,
+  "fields": {
+    "name": "Ugali Matumbo",
+    "description": "Firm ugali served with flavorful beef tripe stew. Affordable and protein-rich.",
+    "category": 3,
+    "price": "100.00",
+    "image": "food_images/ugMatumbo_2sJlFBi.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:02:41.303Z",
+    "updated_at": "2025-10-03T14:02:41.303Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 9,
+  "fields": {
+    "name": "Chapo",
+    "description": "Fluffy soft chapa-i.",
+    "category": 2,
+    "price": "20.00",
+    "image": "food_images/chapo_pjX6yyu.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 5,
+    "created_at": "2025-10-03T14:03:56.999Z",
+    "updated_at": "2025-10-05T09:50:14.639Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 10,
+  "fields": {
+    "name": "Ugali Mayai",
+    "description": "Freshly cooked ugali served with either fried eggs or sliced boiled eggs.",
+    "category": 3,
+    "price": "90.00",
+    "image": "food_images/ugMayai_DafUhV2.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:04:36.485Z",
+    "updated_at": "2025-10-03T14:04:36.485Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 11,
+  "fields": {
+    "name": "Chapo Matumbo",
+    "description": "Soft chapatis served with well-seasoned beef tripe stew (matumbo).",
+    "category": 3,
+    "price": "90.00",
+    "image": "food_images/chMatumbo_Wkgjo3p.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:05:45.524Z",
+    "updated_at": "2025-10-03T14:05:45.524Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 12,
+  "fields": {
+    "name": "Boiled Eggs (Pasua)",
+    "description": "A boiled egg topped with a bit of spicy kachumbari (tomato–onion salad).",
+    "category": 2,
+    "price": "25.00",
+    "image": "food_images/boilo_a0x4rAo.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 5,
+    "created_at": "2025-10-03T14:07:27.129Z",
+    "updated_at": "2025-10-03T18:27:54.326Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 13,
+  "fields": {
+    "name": "Pilau",
+    "description": "Rice cooked with aromatic pilau spices like cinnamon, cloves, cardamom, and ginger, often served with meat or plain.",
+    "category": 2,
+    "price": "100.00",
+    "image": "food_images/pilau_MNlmfR1.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 2,
+    "created_at": "2025-10-03T14:08:46.458Z",
+    "updated_at": "2025-10-03T19:04:39.290Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 14,
+  "fields": {
+    "name": "Ugali Mala",
+    "description": "Combo of ugali paired with sour fermented mala.",
+    "category": 3,
+    "price": "70.00",
+    "image": "food_images/ugmala_DPRfFFt.jpeg",
+    "prep_time": 10,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:10:06.554Z",
+    "updated_at": "2025-10-03T14:10:06.554Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 15,
+  "fields": {
+    "name": "Kuku Special",
+    "description": "Tender chicken (fried, stewed, or grilled), seasoned with local spices, served hot with kachumbari and a choice of ugali or chapati",
+    "category": 2,
+    "price": "100.00",
+    "image": "food_images/chicken_APd4w6i.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": true,
+    "is_meal_of_day": false,
+    "times_ordered": 1,
+    "created_at": "2025-10-03T14:11:09.485Z",
+    "updated_at": "2025-10-03T18:23:13.957Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 16,
+  "fields": {
+    "name": "Chapo Beef",
+    "description": "Fluffy chapatis with rich beef stew. A filling, tasty classic.",
+    "category": 3,
+    "price": "110.00",
+    "image": "food_images/chBeef_C61MTe9.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:12:29.995Z",
+    "updated_at": "2025-10-03T14:12:29.995Z"
+  }
+},
+{
+  "model": "urbanfoods.fooditem",
+  "pk": 17,
+  "fields": {
+    "name": "Ugali Kienyeji",
+    "description": "Ugali with nutritious mboga kienyeji (managu), healthy and affordable.",
+    "category": 3,
+    "price": "80.00",
+    "image": "food_images/ugManagu_RUiWoKQ.jpeg",
+    "prep_time": 15,
+    "is_available": true,
+    "is_featured": false,
+    "is_meal_of_day": false,
+    "times_ordered": 0,
+    "created_at": "2025-10-03T14:14:09.224Z",
+    "updated_at": "2025-10-03T14:14:09.224Z"
+  }
+}
+]
