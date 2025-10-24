@@ -7,7 +7,7 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'CkjROe1297NYoJ2iKGEfoSVbKcNRwkkS_CsQQgLGyuRLsfbD8cvUPCZM2srW04goB1Q')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # settings.py
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # default
@@ -32,12 +32,14 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin',  # Django's built-in admin
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',  # Add before django.contrib.staticfiles
+    'cloudinary',
     'urbanfoods',  # Your app name
     'rest_framework',  # For API endpoints
 ]
@@ -124,10 +126,25 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Cloudinary Configuration for media storage
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+# Use Cloudinary for media files in production
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
+# Static files storage - use basic storage in production to avoid manifest errors
+if DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+else:
+    # In production, use basic storage to avoid issues with missing static files
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Session Configuration
 SESSION_COOKIE_AGE = 604800  # 1 week
@@ -168,6 +185,7 @@ CACHES = {
 
 # Security Settings (Production)
 if not DEBUG:
+    # Don't use SECURE_SSL_REDIRECT on Railway - they handle HTTPS at proxy level
     # SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -177,6 +195,8 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     X_FRAME_OPTIONS = 'DENY'
+    
+    # Trust Railway's proxy headers
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging
