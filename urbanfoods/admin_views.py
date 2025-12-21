@@ -1,12 +1,15 @@
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 from django.db.models.functions import ExtractHour, TruncDate
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg, Max
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
+from datetime import timedelta
 from .utils import send_push_to_all
+from .models import *
 import json
 
 def staff_member_required(view_func=None, login_url='admin_login'):
@@ -45,14 +48,6 @@ def admin_login(request):
                 })
 
     return render(request, 'custom_admin/login.html')
-
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from django.db.models import Sum, Count, Avg
-from django.utils import timezone
-from datetime import timedelta
-from .models import *
-import json
 
 # ==================== ADMIN DASHBOARD ====================
 
@@ -331,15 +326,30 @@ def cancel_order(request):
 @staff_member_required(login_url='admin_login')
 def admin_menu(request):
     """Food menu management"""
-    categories = FoodCategory.objects.all()
-    food_items = FoodItem.objects.all().select_related('category')
+    categories = FoodCategory.objects.filter(store_type='food')
+    food_items = FoodItem.objects.filter(store_type='food').select_related('category')
 
     context = {
         'categories': categories,
         'food_items': food_items,
+        'store_type': 'food',
     }
 
     return render(request, 'custom_admin/menu.html', context)
+
+@staff_member_required(login_url='admin_login')
+def admin_liquor(request):
+    """Liquor store management"""
+    categories = FoodCategory.objects.filter(store_type='liquor')
+    food_items = FoodItem.objects.filter(store_type='liquor').select_related('category')
+
+    context = {
+        'categories': categories,
+        'food_items': food_items,
+        'store_type': 'liquor',
+    }
+
+    return render(request, 'custom_admin/liquor.html', context)
 
 @staff_member_required(login_url='admin_login')
 def toggle_food_availability(request):
@@ -391,10 +401,12 @@ def add_category(request):
         if not name:
             return JsonResponse({'success': False, 'message': 'Category name is required'})
 
+        store_type = data.get('store_type', 'food')
         category = FoodCategory.objects.create(
             name=name,
             description=description,
-            order=order
+            order=order,
+            store_type=store_type
         )
 
         return JsonResponse({
@@ -479,13 +491,18 @@ def add_food_item(request):
         except FoodCategory.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Invalid category'})
 
+        bottle_size = request.POST.get('bottle_size', '')
+        store_type = request.POST.get('store_type', 'food')
+        
         food_item = FoodItem.objects.create(
             name=name,
             description=description,
             category=category,
             price=price,
             prep_time=prep_time,
-            image=image
+            image=image,
+            bottle_size=bottle_size,
+            store_type=store_type
         )
 
         return JsonResponse({
@@ -522,6 +539,9 @@ def edit_food_item(request):
         food_item.category = category
         food_item.price = price
         food_item.prep_time = prep_time
+        bottle_size = request.POST.get('bottle_size', '')
+        if bottle_size:
+            food_item.bottle_size = bottle_size
         if image:
             food_item.image = image
         food_item.save()
@@ -612,6 +632,50 @@ def admin_analytics(request):
     # Peak hours
     peak_hours = (Order.objects.filter(created_at__gte=start_date).annotate(hour=ExtractHour('created_at')).values('hour').annotate(order_count=Count('id')).order_by('-order_count')[:10])
 
+    # Liquor-specific metrics
+    liquor_orders = Order.objects.filter(
+        created_at__gte=start_date,
+        items__food_item__store_type='liquor'
+    ).distinct()
+    
+    liquor_revenue = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('price_at_order'))['total'] or 0
+    
+    liquor_items_sold = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+    
+    # Top selling liquor items
+    top_liquor_items = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).values(
+        'food_item__name',
+        'food_item__category__name',
+        'food_item__bottle_size'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum('price_at_order')
+    ).order_by('-total_quantity')[:10]
+    
+    # Liquor revenue trend
+    liquor_daily_revenue = (
+    OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    )
+    .annotate(day=TruncDate('order__created_at'))
+    .values('day')
+    .annotate(
+        revenue=Sum('price_at_order'),
+        orders=Count('order', distinct=True)
+    )
+    .order_by('day')
+    )
+
     context = {
         'daily_revenue': json.dumps(list(daily_revenue), default=str),
         'top_items': json.dumps(list(top_items), default=str),
@@ -622,6 +686,12 @@ def admin_analytics(request):
         'total_orders': total_orders,
         'avg_order_value': avg_order_value,
         'peak_hours': json.dumps(list(peak_hours), default=str),
+        # Liquor metrics
+        'liquor_revenue': liquor_revenue,
+        'liquor_orders_count': liquor_orders.count(),
+        'liquor_items_sold': liquor_items_sold,
+        'top_liquor_items': json.dumps(list(top_liquor_items), default=str),
+        'liquor_daily_revenue': json.dumps(list(liquor_daily_revenue), default=str),
     }
 
     return render(request, 'custom_admin/analytics.html', context)
@@ -732,28 +802,92 @@ def update_customer_status(request):
     return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 @staff_member_required(login_url='admin_login')
+def admin_profile(request):
+    """Admin profile page"""
+    return render(request, 'custom_admin/profile.html')
+
+@staff_member_required(login_url='admin_login')
 def update_admin_profile(request):
     """Update admin profile information"""
     if request.method == 'POST':
         data = json.loads(request.body)
-        name = data.get('name', '').strip()
+        username = data.get('username', '').strip()
         email = data.get('email', '').strip()
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
 
-        if not name or not email:
+        if not username or not email:
             return JsonResponse({
                 'success': False,
-                'message': 'Name and email are required'
+                'message': 'Username and email are required'
+            })
+
+        # Check if username is already taken by another user
+        user = request.user
+        if User.objects.filter(username=username).exclude(id=user.id).exists():
+            return JsonResponse({
+                'success': False,
+                'message': 'Username already taken'
             })
 
         # Update the admin user
-        user = request.user
-        user.first_name, user.last_name = name.split(' ', 1) if ' ' in name else (name, '')
+        user.username = username
         user.email = email
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
         user.save()
 
         return JsonResponse({
             'success': True,
             'message': 'Profile updated successfully'
+        })
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+@staff_member_required(login_url='admin_login')
+def update_admin_password(request):
+    """Update admin password"""
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+        confirm_password = data.get('confirm_password')
+
+        if not old_password or not new_password or not confirm_password:
+            return JsonResponse({
+                'success': False,
+                'message': 'All password fields are required'
+            })
+
+        if new_password != confirm_password:
+            return JsonResponse({
+                'success': False,
+                'message': 'New passwords do not match'
+            })
+
+        if len(new_password) < 8:
+            return JsonResponse({
+                'success': False,
+                'message': 'Password must be at least 8 characters long'
+            })
+
+        # Verify old password
+        user = request.user
+        if not user.check_password(old_password):
+            return JsonResponse({
+                'success': False,
+                'message': 'Current password is incorrect'
+            })
+
+        # Set new password
+        user.set_password(new_password)
+        user.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Password updated successfully'
         })
 
     return JsonResponse({'success': False, 'message': 'Invalid request'})

@@ -10,7 +10,7 @@
 {% block content %}
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Analytics & Reports</h1>
+    <h1 class="h3 mb-0 text-gray-800" style="color: #2d3748 !important;">Analytics & Reports</h1>
     <div class="d-flex gap-2">
       <select class="form-select form-select-sm" id="timeRange" onchange="changeTimeRange()" style="width: auto;">
         <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
@@ -74,6 +74,62 @@
     </div>
   </div>
 
+  <!-- Liquor Metrics -->
+  <div class="row g-4 mb-4">
+    <div class="col-12">
+      <h5 class="mb-3" style="color: #2d3748 !important;"><i class="fas fa-wine-bottle me-2"></i>Liquor Store Metrics</h5>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Liquor Revenue</h6>
+            <h4 class="mb-0 text-success">KES {{ liquor_revenue|floatformat:2 }}</h4>
+          </div>
+          <i class="fas fa-wine-bottle fa-2x text-success opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Liquor Orders</h6>
+            <h4 class="mb-0 text-primary">{{ liquor_orders_count }}</h4>
+          </div>
+          <i class="fas fa-shopping-cart fa-2x text-primary opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Bottles Sold</h6>
+            <h4 class="mb-0 text-info">{{ liquor_items_sold }}</h4>
+          </div>
+          <i class="fas fa-wine-glass fa-2x text-info opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="admin-card p-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Avg Order Value</h6>
+            <h4 class="mb-0 text-warning" id="liquorAvgOrderValue">
+              KES 0.00
+            </h4>
+          </div>
+          <i class="fas fa-chart-line fa-2x text-warning opacity-75"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- Charts Row -->
 <div class="row mb-4">
     <!-- Revenue Chart -->
@@ -111,7 +167,7 @@
     <div class="col-lg-6 mb-4">
         <div class="admin-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-fire me-2"></i> Top Selling Items</h5>
+                <h5 class="mb-0"><i class="fas fa-fire me-2"></i> Top Selling Items (Food)</h5>
             </div>
             <div class="card-body">
                 <div id="topItemsList">
@@ -136,6 +192,37 @@
     </div>
 </div>
 
+<!-- Liquor Analytics -->
+<div class="row mb-4">
+    <!-- Liquor Revenue Trend -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Liquor Revenue Trend</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="liquorRevenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Liquor Items -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-wine-bottle me-2"></i> Top Liquor Items</h5>
+            </div>
+            <div class="card-body">
+                <div id="topLiquorItemsList">
+                    <!-- Top liquor items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Peak Hours -->
 <div class="admin-card">
     <div class="card-header">
@@ -151,7 +238,7 @@
 
 {% block extra_js %}
 <script>
-let revenueChart, statusChart, peakHoursChart;
+let revenueChart, statusChart, peakHoursChart, liquorRevenueChart;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeCharts();
@@ -164,6 +251,8 @@ function initializeCharts() {
     const peakHoursData = JSON.parse('{{ peak_hours|escapejs }}');
     const topItemsData = JSON.parse('{{ top_items|escapejs }}');
     const topCustomersData = JSON.parse('{{ top_customers|escapejs }}');
+    const topLiquorItemsData = JSON.parse('{{ top_liquor_items|escapejs }}');
+    const liquorRevenueData = JSON.parse('{{ liquor_daily_revenue|escapejs }}');
 
     // Revenue Chart
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
@@ -283,12 +372,103 @@ function initializeCharts() {
         }
     });
 
+    // Liquor Revenue Chart
+    const liquorRevenueCtx = document.getElementById('liquorRevenueChart');
+    if (liquorRevenueCtx) {
+        liquorRevenueChart = new Chart(liquorRevenueCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: liquorRevenueData.map(item => {
+                    const date = new Date(item.day);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }),
+                datasets: [{
+                    label: 'Liquor Revenue (KES)',
+                    data: liquorRevenueData.map(item => parseFloat(item.revenue) || 0),
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Liquor Orders',
+                    data: liquorRevenueData.map(item => item.orders || 0),
+                    borderColor: '#f97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Populate Top Liquor Items List
+    const topLiquorItemsList = document.getElementById('topLiquorItemsList');
+    if (topLiquorItemsList) {
+        if (topLiquorItemsData.length > 0) {
+            topLiquorItemsData.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'd-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded';
+                itemDiv.innerHTML = `
+                    <div>
+                        <h6 class="mb-1">${item.food_item__name}</h6>
+                        <small class="text-muted">${item.food_item__category__name || 'Uncategorized'}</small>
+                        ${item.food_item__bottle_size ? `<br><small class="text-muted">${item.food_item__bottle_size}</small>` : ''}
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-danger">${item.total_quantity} sold</span>
+                        <br>
+                        <small class="text-success fw-bold">KES ${parseFloat(item.total_revenue).toFixed(0)}</small>
+                    </div>
+                `;
+                topLiquorItemsList.appendChild(itemDiv);
+            });
+        } else {
+            topLiquorItemsList.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-wine-bottle fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No liquor sales data available</p>
+                </div>
+            `;
+        }
+    }
+
     // Set top item name in metrics card
     const topItemName = document.getElementById('topItemName');
     if (topItemsData.length > 0) {
         topItemName.textContent = topItemsData[0].food_item__name;
     } else {
         topItemName.textContent = 'N/A';
+    }
+
+    // Calculate and set liquor average order value
+    const liquorAvgOrderValue = document.getElementById('liquorAvgOrderValue');
+    const liquorOrdersCount = {{ liquor_orders_count }};
+    const liquorRevenue = {{ liquor_revenue|floatformat:2 }};
+    if (liquorAvgOrderValue && liquorOrdersCount > 0) {
+        const avgValue = (liquorRevenue / liquorOrdersCount).toFixed(2);
+        liquorAvgOrderValue.textContent = `KES ${avgValue}`;
     }
 
     // Populate Top Items List

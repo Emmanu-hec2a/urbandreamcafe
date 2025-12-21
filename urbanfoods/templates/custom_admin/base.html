@@ -317,6 +317,16 @@
             }
         }
 
+        .form-label, .form-check-label {
+            font-weight: 600 !important;
+            color: #2d3748 !important;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea !important;
+            border-color: #667eea !important;
+        }
+
         .mobile-menu-toggle {
             display: none;
         }
@@ -614,7 +624,15 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'admin_menu' %}active{% endif %}"
                        href="{% url 'admin_menu' %}">
                         <i class="fas fa-utensils me-2"></i>
-                        Menu
+                        Food Menu
+                    </a>
+                </li>
+
+                <li class="nav-item mb-2">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_liquor' %}active{% endif %}"
+                       href="{% url 'admin_liquor' %}">
+                        <i class="fas fa-wine-bottle me-2"></i>
+                        Liquor Store
                     </a>
                 </li>
 
@@ -723,7 +741,7 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><h6 class="dropdown-header">{{ request.user.get_full_name|default:request.user.username }}</h6></li>
-                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
@@ -735,6 +753,7 @@
 
             <!-- Page Content -->
             <main class="p-4">
+                {% csrf_token %}
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -900,13 +919,19 @@
         // Theme management
         function toggleThemeMenu() {
             const menu = document.getElementById('themeMenu');
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            if (menu) {
+                const isHidden = menu.style.display === 'none' || !menu.style.display;
+                menu.style.display = isHidden ? 'block' : 'none';
+            }
         }
 
         function setTheme(theme) {
             localStorage.setItem('admin-theme', theme);
             applyTheme(theme);
-            document.getElementById('themeMenu').style.display = 'none';
+            const menu = document.getElementById('themeMenu');
+            if (menu) {
+                menu.style.display = 'none';
+            }
         }
 
         function applyTheme(theme) {
@@ -915,18 +940,26 @@
 
             if (theme === 'dark') {
                 html.setAttribute('data-bs-theme', 'dark');
-                themeIcon.className = 'fas fa-moon text-primary';
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-moon text-primary';
+                }
             } else if (theme === 'light') {
                 html.removeAttribute('data-bs-theme');
-                themeIcon.className = 'fas fa-sun text-warning';
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-sun text-warning';
+                }
             } else if (theme === 'auto') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (prefersDark) {
                     html.setAttribute('data-bs-theme', 'dark');
-                    themeIcon.className = 'fas fa-moon text-primary';
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-moon text-primary';
+                    }
                 } else {
                     html.removeAttribute('data-bs-theme');
-                    themeIcon.className = 'fas fa-sun text-warning';
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-sun text-warning';
+                    }
                 }
             }
         }
@@ -949,10 +982,34 @@
             const themeMenu = document.getElementById('themeMenu');
             const themeButton = event.target.closest('button[onclick="toggleThemeMenu()"]');
 
-            if (!themeButton && !themeMenu.contains(event.target) && themeMenu.style.display === 'block') {
-                themeMenu.style.display = 'none';
+            if (themeMenu && themeButton && !themeMenu.contains(event.target) && !themeButton.contains(event.target)) {
+                if (themeMenu.style.display === 'block') {
+                    themeMenu.style.display = 'none';
+                }
             }
         });
+
+        // Get CSRF token helper function
+        function getCSRFToken() {
+            const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (tokenInput) {
+                return tokenInput.value;
+            }
+            // Fallback: try to get from cookie
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 
     {% block extra_js %}{% endblock %}

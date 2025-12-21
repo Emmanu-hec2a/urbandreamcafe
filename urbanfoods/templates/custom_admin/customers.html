@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0">Customer Management</h4>
+    <h4 class="mb-0" style="color: #2d3748;">Customer Management</h4>
     <div class="d-flex gap-2">
         <input type="text" class="form-control" id="searchInput" placeholder="Search customers...">
         <button class="btn btn-outline-primary" onclick="exportCustomers()">
@@ -355,7 +355,7 @@ document.getElementById('sendMessageBtn').addEventListener('click', function() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             customer_id: currentCustomerId,
@@ -399,7 +399,7 @@ function updateCustomerStatus(customerId, isActive) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             customer_id: customerId,

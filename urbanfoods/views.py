@@ -13,14 +13,18 @@ import json
 
 def homepage(request):
     """Main food catalog page"""
-    categories = FoodCategory.objects.all()
+    # Get store type from session or default to 'food'
+    store_type = request.session.get('store_type', 'food')
+    
+    # Filter categories by store type
+    categories = FoodCategory.objects.filter(store_type=store_type)
 
     # Get filter parameters
     category_id = request.GET.get('category')
     search_query = request.GET.get('q')
 
-    # Base queryset
-    food_items = FoodItem.objects.filter(is_available=True)
+    # Base queryset filtered by store type
+    food_items = FoodItem.objects.filter(is_available=True, store_type=store_type)
 
     # Apply filters
     if category_id:
@@ -31,10 +35,11 @@ def homepage(request):
             Q(description__icontains=search_query)
         )
 
-    # Get special items
-    meal_of_day = FoodItem.objects.filter(is_meal_of_day=True, is_available=True).first()
-    featured_items = FoodItem.objects.filter(is_featured=True, is_available=True)[:4]
-    popular_items = FoodItem.objects.filter(is_available=True).order_by('-times_ordered')[:6]
+    # Get special items filtered by store type
+    meal_of_day = FoodItem.objects.filter(is_meal_of_day=True, is_available=True, store_type=store_type).first()
+    featured_items_queryset = FoodItem.objects.filter(is_featured=True, is_available=True, store_type=store_type)[:4]
+    featured_items = list(featured_items_queryset) if featured_items_queryset else []
+    popular_items = FoodItem.objects.filter(is_available=True, store_type=store_type).order_by('-times_ordered')[:6]
 
     # Cart count
     cart_count = 0
@@ -51,8 +56,38 @@ def homepage(request):
         'cart_count': cart_count,
         'selected_category': category_id,
         'search_query': search_query,
+        'store_type': store_type,
     }
     return render(request, 'homepage.html', context)
+
+@require_http_methods(["POST"])
+def switch_store(request):
+    """Switch between food and liquor store"""
+    data = json.loads(request.body)
+    store_type = data.get('store_type', 'food')
+    
+    if store_type in ['food', 'liquor']:
+        # Clear cart if user is authenticated and cart has items of different store type
+        if request.user.is_authenticated:
+            try:
+                cart, _ = Cart.objects.get_or_create(user=request.user)
+                if cart.items.exists():
+                    # Check if cart has items of different store type
+                    cart_items = cart.items.select_related('food_item').all()
+                    has_different_store_type = any(
+                        item.food_item.store_type != store_type for item in cart_items
+                    )
+                    
+                    if has_different_store_type:
+                        # Clear the cart
+                        cart.items.all().delete()
+            except Cart.DoesNotExist:
+                pass
+        
+        request.session['store_type'] = store_type
+        return JsonResponse({'success': True, 'store_type': store_type})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid store type'}, status=400)
 
 # ==================== AUTHENTICATION ====================
 
@@ -139,6 +174,17 @@ def add_to_cart(request):
 
     food_item = get_object_or_404(FoodItem, id=food_item_id, is_available=True)
     cart, _ = Cart.objects.get_or_create(user=request.user)
+
+    # Check if cart has items of different store type
+    if cart.items.exists():
+        cart_items = cart.items.select_related('food_item').all()
+        existing_store_type = cart_items.first().food_item.store_type
+        
+        if existing_store_type != food_item.store_type:
+            return JsonResponse({
+                'success': False,
+                'message': f'Cannot mix {existing_store_type} and {food_item.store_type} items in cart. Please clear your cart first or switch stores.'
+            }, status=400)
 
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,

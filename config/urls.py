@@ -28,6 +28,9 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     
+    # ==================== STORE SWITCHING ================
+    path('api/store/switch/', views.switch_store, name='switch_store'),
+    
     # ==================== CART & ORDERS ================
     # Cart operations
     path('api/cart/', views.get_cart, name='get_cart'),
@@ -57,6 +60,7 @@ urlpatterns = [
     
     # Menu management
     path('admin-panel/menu/', admin_views.admin_menu, name='admin_menu'),
+    path('admin-panel/liquor/', admin_views.admin_liquor, name='admin_liquor'),
     path('admin-panel/api/menu/toggle-availability/', admin_views.toggle_food_availability, name='toggle_food_availability'),
     path('admin-panel/api/menu/update-price/', admin_views.update_food_price, name='update_food_price'),
     path('admin-panel/api/menu/add-category/', admin_views.add_category, name='add_category'),
@@ -80,6 +84,10 @@ urlpatterns = [
     path('admin-panel/api/dashboard/stats/', admin_views.admin_dashboard_stats, name='dashboard_stats'),
     path('admin-panel/api/orders/recent/', admin_views.get_new_orders, name='admin_api_new_orders'),
     path('admin-panel/api/admin/update-profile/', admin_views.update_admin_profile, name='admin_api_update_admin_profile'),
+    
+    # Admin Profile
+    path('admin-panel/profile/', admin_views.admin_profile, name='admin_profile'),
+    path('admin-panel/api/admin/update-password/', admin_views.update_admin_password, name='admin_api_update_password'),
     
     # Reviews management
     path('orders/<str:order_number>/submit_review/', views.submit_food_review, name='submit_food_review'),

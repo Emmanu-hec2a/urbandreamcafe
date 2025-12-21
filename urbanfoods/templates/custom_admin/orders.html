@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0">Order Management</h4>
+    <h4 class="mb-0" style="color: #2d3748;">Order Management</h4>
     <div class="d-flex gap-2">
         <select class="form-select" id="statusFilter" onchange="filterOrders()">
             <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Orders</option>
@@ -239,7 +239,7 @@ document.getElementById('confirmStatusUpdate').addEventListener('click', functio
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             order_number: currentOrderNumber,
@@ -279,7 +279,7 @@ document.getElementById('confirmCancelOrder').addEventListener('click', function
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             order_number: currentOrderNumber,

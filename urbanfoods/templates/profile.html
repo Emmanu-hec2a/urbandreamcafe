@@ -16,7 +16,7 @@
         <!-- Profile Form -->
         <div class="col-lg-8">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header text-white" style="background-color: #ea580c;">
                     <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Profile Information</h5>
                 </div>
                 <div class="card-body">
@@ -66,13 +66,13 @@
         <!-- Stats Card -->
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-success text-white">
+                <div class="card-header text-white" style="background-color: #ea580c;">
                     <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Your Stats</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-muted">Total Orders</span>
-                        <span class="h4 text-primary fw-bold mb-0">{{ user.orders.count }}</span>
+                        <span class="h4 fw-bold mb-0" style="color: #ea580c;">{{ user.orders.count }}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-muted">Loyalty Points</span>
@@ -137,7 +137,7 @@
                                             {{ order.get_status_display }}
                                         </span>
                                     </td>
-                                    <td class="fw-bold text-primary">KES {{ order.total }}</td>
+                                    <td class="fw-bold" style="color: #ea580c;">KES {{ order.total }}</td>
                                     <td>
                                         <a href="{% url 'order_detail' order.order_number %}" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-eye me-1"></i>View
@@ -179,7 +179,10 @@
     color: #a0a0a0 !important;
 }
 [data-bs-theme="dark"] .text-primary {
-    color: #f97316 !important; /* orange-600 */
+    color: #ea580c !important; /* orange-600 */
+}
+[data-bs-theme="dark"] .bg-primary {
+    background-color: #ea580c !important;
 }
 [data-bs-theme="dark"] .text-warning {
     color: #fbbf24 !important; /* yellow-400 */

@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container-fluid my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Order #{{ order.order_number }}</h2>
+        <h2 style="color: #2d3748;">Order #{{ order.order_number }}</h2>
         <div>
             <a href="{% url 'admin_orders' %}" class="btn btn-secondary">Back to Orders</a>
         </div>
@@ -192,7 +192,7 @@ document.getElementById('statusForm').addEventListener('submit', function(e) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             order_number: '{{ order.order_number }}',

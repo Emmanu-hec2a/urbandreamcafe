@@ -18,10 +18,16 @@ class User(AbstractUser):
 
 class FoodCategory(models.Model):
     """Categories for organizing food items"""
+    STORE_CHOICES = [
+        ('food', 'Food Store'),
+        ('liquor', 'Liquor Store'),
+    ]
+    
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)  # emoji or icon class
     order = models.IntegerField(default=0)  # for sorting
+    store_type = models.CharField(max_length=10, choices=STORE_CHOICES, default='food')
     
     class Meta:
         verbose_name_plural = "Food Categories"
@@ -32,6 +38,11 @@ class FoodCategory(models.Model):
 
 class FoodItem(models.Model):
     """Individual food items available for order"""
+    STORE_CHOICES = [
+        ('food', 'Food Store'),
+        ('liquor', 'Liquor Store'),
+    ]
+    
     name = models.CharField(max_length=100)
     description = models.TextField()
     category = models.ForeignKey(FoodCategory, on_delete=models.CASCADE, related_name='items')
@@ -42,8 +53,14 @@ class FoodItem(models.Model):
     is_featured = models.BooleanField(default=False)
     is_meal_of_day = models.BooleanField(default=False)
     times_ordered = models.IntegerField(default=0)  # for popularity tracking
+    store_type = models.CharField(max_length=10, choices=STORE_CHOICES, default='food')
+    bottle_size = models.CharField(max_length=20, blank=True, help_text="For liquor items (e.g., 250ml, 500ml, 750ml)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def is_liquor(self):
+        return self.store_type == 'liquor'
 
     @property
     def average_rating(self):

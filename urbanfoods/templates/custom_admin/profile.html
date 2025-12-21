@@ -1,0 +1,164 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Admin Profile - UrbanFoods Admin{% endblock %}
+
+{% block page_title %}Admin Profile{% endblock %}
+
+{% block breadcrumb_active %}Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Profile Information -->
+        <div class="admin-card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <form id="profileForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Username *</label>
+                            <input type="text" class="form-control" id="username" value="{{ request.user.username }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" value="{{ request.user.email }}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" value="{{ request.user.first_name }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" value="{{ request.user.last_name }}">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-admin-primary">
+                            <i class="fas fa-save me-2"></i>Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form id="passwordForm">
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">Current Password *</label>
+                        <input type="password" class="form-control" id="old_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password *</label>
+                        <input type="password" class="form-control" id="new_password" required minlength="8">
+                        <small class="text-muted">Password must be at least 8 characters long</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password *</label>
+                        <input type="password" class="form-control" id="confirm_password" required minlength="8">
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-admin-primary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = showLoading(button);
+    
+    fetch('/admin-panel/api/admin/update-profile/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            first_name: document.getElementById('first_name').value,
+            last_name: document.getElementById('last_name').value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+        } else {
+            showAlert(data.message || 'Failed to update profile', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating profile:', error);
+        showAlert('Error updating profile', 'danger');
+    })
+    .finally(() => {
+        hideLoading(button, originalText);
+    });
+});
+
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match', 'warning');
+        return;
+    }
+    
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = showLoading(button);
+    
+    fetch('/admin-panel/api/admin/update-password/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            old_password: document.getElementById('old_password').value,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+            document.getElementById('passwordForm').reset();
+        } else {
+            showAlert(data.message || 'Failed to update password', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating password:', error);
+        showAlert('Error updating password', 'danger');
+    })
+    .finally(() => {
+        hideLoading(button, originalText);
+    });
+});
+</script>
+{% endblock %}
+
