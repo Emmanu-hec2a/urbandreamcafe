@@ -323,7 +323,7 @@
                     <input 
                         type="text" 
                         id="searchInput"
-                        placeholder="{% if store_type == 'liquor' %}Search for drinks...{% else %}Search for meals...{% endif %}" 
+                        placeholder="{% if store_type == 'liquor' %}Search for drinks...{% elif store_type == 'grocery' %}Search for groceries...{% else %}Search for meals...{% endif %}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                 </div>
@@ -340,14 +340,19 @@
                         <div id="storeDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                             <div class="py-2">
                                 <button onclick="switchStore('food')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-utensils mr-3"></i>
+                                    <i class="fas fa-utensils mr-3" style="color:#DC143C"></i>
                                     <span class="flex-1 text-left">Food Store</span>
                                     {% if store_type == 'food' %}<i class="fas fa-check text-orange-600"></i>{% endif %}
                                 </button>
                                 <button onclick="switchStore('liquor')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-wine-bottle mr-3"></i>
+                                    <i class="fas fa-wine-bottle mr-3" style="color:cadetblue"></i>
                                     <span class="flex-1 text-left">Liquor Store</span>
                                     {% if store_type == 'liquor' %}<i class="fas fa-check text-orange-600"></i>{% endif %}
+                                </button>
+                                <button onclick="switchStore('grocery')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-shopping-cart mr-3" style="color:green"></i>
+                                    <span class="flex-1 text-left">Grocery Shop</span>
+                                    {% if store_type == 'grocery' %}<i class="fas fa-check text-orange-600"></i>{% endif %}
                                 </button>
                             </div>
                         </div>
@@ -433,7 +438,7 @@
         <!-- Featured Items -->
         {% if featured_items %}
         <div class="mb-12">
-            <h2 class="text-2xl font-bold mb-4">⭐ {% if store_type == 'liquor' %}Featured Drinks{% else %}Featured Items{% endif %}</h2>
+            <h2 class="text-2xl font-bold mb-4">⭐ {% if store_type == 'liquor' %}Featured Drinks{% elif store_type == 'grocery' %}Featured Groceries{% else %}Featured Items{% endif %}</h2>
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {% for item in featured_items %}
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
@@ -480,7 +485,7 @@
 
         <!-- All Food Items -->
         <div class="mb-8">
-            <h2 class="text-2xl font-bold mb-4" style="font-weight: 800; font-size: 2rem;">{% if store_type == 'liquor' %} All Drinks{% else %}🍽️ All Meals{% endif %}</h2>
+            <h2 class="text-2xl font-bold mb-4" style="font-weight: 800; font-size: 2rem;">{% if store_type == 'liquor' %} All Drinks{% elif store_type == 'grocery' %} All Groceries{% else %}🍽️ All Meals{% endif %}</h2>
             {% if food_items %}
             <div id="foodGrid" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {% for item in food_items %}
@@ -537,9 +542,9 @@
             </div>
             {% else %}
             <div class="bg-white rounded-lg shadow-md p-12 text-center">
-                <i class="fas fa-{% if store_type == 'liquor' %}wine-bottle{% else %}utensils{% endif %} text-gray-300 text-6xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">No {% if store_type == 'liquor' %}drinks{% else %}meals{% endif %} available</h3>
-                <p class="text-gray-600">We're currently updating our {% if store_type == 'liquor' %}drink{% else %}food{% endif %} menu. Please check back soon!</p>
+                <i class="fas fa-{% if store_type == 'liquor' %}wine-bottle{% elif store_type == 'grocery' %}shopping-cart{% else %}utensils{% endif %} text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No {% if store_type == 'liquor' %}drinks{% elif store_type == 'grocery' %}groceries{% else %}meals{% endif %} available</h3>
+                <p class="text-gray-600">We're currently updating our {% if store_type == 'liquor' %}drink{% elif store_type == 'grocery' %}grocery{% else %}food{% endif %} menu. Please check back soon!</p>
             </div>
             {% endif %}
         </div>
@@ -879,7 +884,7 @@
         function prefillCheckoutForm() {
             {% if user.default_hostel %}
             const hostelSelect = document.getElementById('hostelSelect');
-            const defaultHostel = '{{ user.default_hostel }}';
+            const defaultHostel = '{{ user.default_hostel|escapejs }}';
 
             // Check if default hostel is in the predefined options
             const options = Array.from(hostelSelect.options);
@@ -896,11 +901,11 @@
             {% endif %}
 
             {% if user.default_room %}
-            document.getElementById('roomNumber').value = '{{ user.default_room }}';
+            document.getElementById('roomNumber').value = '{{ user.default_room|escapejs }}';
             {% endif %}
 
             {% if user.phone_number %}
-            document.getElementById('phoneNumber').value = '{{ user.phone_number }}';
+            document.getElementById('phoneNumber').value = '{{ user.phone_number|escapejs }}';
             {% endif %}
         }
 

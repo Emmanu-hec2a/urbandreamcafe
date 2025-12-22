@@ -31,15 +31,24 @@ def admin_login(request):
             data = json.loads(request.body)
             username = data.get('username')
             password = data.get('password')
+            store_type = data.get('store_type', 'main')
 
             user = authenticate(username=username, password=password)
 
             if user is not None and user.is_staff:
                 login(request, user)
+                # Redirect based on store type
+                if store_type == 'liquor':
+                    redirect_url = '/admin-panel/liquor/'
+                elif store_type == 'grocery':
+                    redirect_url = '/admin-panel/grocery/'
+                else:
+                    redirect_url = '/admin-panel/'
+
                 return JsonResponse({
                     'success': True,
                     'message': 'Admin login successful!',
-                    'redirect': '/admin-panel/'
+                    'redirect': redirect_url
                 })
             else:
                 return JsonResponse({
@@ -350,6 +359,20 @@ def admin_liquor(request):
     }
 
     return render(request, 'custom_admin/liquor.html', context)
+
+@staff_member_required(login_url='admin_login')
+def admin_grocery(request):
+    """Grocery store management"""
+    categories = FoodCategory.objects.filter(store_type='grocery')
+    food_items = FoodItem.objects.filter(store_type='grocery').select_related('category')
+
+    context = {
+        'categories': categories,
+        'food_items': food_items,
+        'store_type': 'grocery',
+    }
+
+    return render(request, 'custom_admin/grocery.html', context)
 
 @staff_member_required(login_url='admin_login')
 def toggle_food_availability(request):

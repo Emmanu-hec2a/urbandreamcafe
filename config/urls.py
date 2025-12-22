@@ -61,6 +61,7 @@ urlpatterns = [
     # Menu management
     path('admin-panel/menu/', admin_views.admin_menu, name='admin_menu'),
     path('admin-panel/liquor/', admin_views.admin_liquor, name='admin_liquor'),
+    path('admin-panel/grocery/', admin_views.admin_grocery, name='admin_grocery'),
     path('admin-panel/api/menu/toggle-availability/', admin_views.toggle_food_availability, name='toggle_food_availability'),
     path('admin-panel/api/menu/update-price/', admin_views.update_food_price, name='update_food_price'),
     path('admin-panel/api/menu/add-category/', admin_views.add_category, name='add_category'),

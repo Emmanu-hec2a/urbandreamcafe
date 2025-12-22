@@ -286,6 +286,13 @@
                                     {% if store_type == 'liquor' %}<i class="fas fa-check text-primary float-end"></i>{% endif %}
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="switchStore('grocery'); return false;">
+                                    <i class="fas fa-shopping-cart me-2"></i>
+                                    Grocery Shop
+                                    {% if store_type == 'grocery' %}<i class="fas fa-check text-primary float-end"></i>{% endif %}
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <!-- Theme Toggle -->

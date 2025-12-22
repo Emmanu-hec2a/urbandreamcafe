@@ -66,7 +66,7 @@ def switch_store(request):
     data = json.loads(request.body)
     store_type = data.get('store_type', 'food')
     
-    if store_type in ['food', 'liquor']:
+    if store_type in ['food', 'liquor', 'grocery']:
         # Clear cart if user is authenticated and cart has items of different store type
         if request.user.is_authenticated:
             try:
@@ -160,7 +160,7 @@ def login_view(request):
 def logout_view(request):
     """User logout"""
     logout(request)
-    return redirect('homepage')
+    return redirect('login')
 
 # ==================== CART OPERATIONS ====================
 

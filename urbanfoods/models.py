@@ -21,6 +21,7 @@ class FoodCategory(models.Model):
     STORE_CHOICES = [
         ('food', 'Food Store'),
         ('liquor', 'Liquor Store'),
+        ('grocery', 'Grocery Shop'),
     ]
     
     name = models.CharField(max_length=50, unique=True)
@@ -41,6 +42,7 @@ class FoodItem(models.Model):
     STORE_CHOICES = [
         ('food', 'Food Store'),
         ('liquor', 'Liquor Store'),
+        ('grocery', 'Grocery Shop'),
     ]
     
     name = models.CharField(max_length=100)

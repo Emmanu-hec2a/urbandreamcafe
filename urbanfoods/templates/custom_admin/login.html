@@ -31,6 +31,14 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="store_type" class="form-label">Admin Panel Type</label>
+                        <select class="form-select" id="store_type" name="store_type" required>
+                            <option value="main">Food Admin</option>
+                            <option value="grocery">Grocery Admin</option>
+                            <option value="liquor">Liquor Admin</option>
+                        </select>
+                    </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember">
                         <label class="form-check-label" for="remember">Remember me</label>
@@ -59,6 +67,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', function(e)
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const store_type = document.getElementById('store_type').value;
     const remember = document.getElementById('remember').checked;
 
     const button = document.getElementById('loginBtn');
@@ -76,6 +85,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', function(e)
         body: JSON.stringify({
             username: username,
             password: password,
+            store_type: store_type,
             remember: remember
         })
     })
