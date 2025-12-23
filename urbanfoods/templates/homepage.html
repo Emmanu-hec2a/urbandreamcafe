@@ -305,6 +305,85 @@
         [data-bs-theme="dark"] .brand-logo {
             color: #DC143C !important;
         }
+
+        /* Delivery Banner Styles */
+        .delivery-banner {
+            position: sticky;
+            top: 64px; /* Below nav height */
+            background: linear-gradient(90deg, #ea580c, #dc2626);
+            color: white;
+            height: 36px;
+            overflow: hidden;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        .banner-text {
+            font-size: 0.975rem;
+            font-weight: 800;
+            white-space: nowrap;
+            animation: marquee 20s linear infinite;
+            animation-play-state: running;
+        }
+
+        .banner-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            margin-left: 1rem;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .banner-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .banner-text:hover,
+        .banner-text:active {
+            animation-play-state: paused;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 767px) {
+            .delivery-banner {
+                top: 56px; /* Adjust for mobile nav */
+                height: 32px;
+            }
+            .banner-text {
+                font-size: 0.75rem;
+                animation-duration: 15s;
+            }
+            .banner-close {
+                font-size: 1rem;
+                margin-left: 0.5rem;
+            }
+        }
+
+        /* Dark theme for banner */
+        [data-bs-theme="dark"] .delivery-banner {
+            background: linear-gradient(90deg, #dc2626, #b91c1c);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -400,7 +479,15 @@
         </div>
     </nav>
 
-    
+    {% if store_type == 'food' %}
+    <div id="delivery-banner" class="delivery-banner">
+        <div class="banner-content">
+            <span class="banner-text">🕒 Delivery Schedule → Lunch: 12-3:30 PM | Supper: 5-7 PM | Order early</span>
+            <button class="banner-close" onclick="dismissBanner()">&times;</button>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Meal of the Day Banner -->
     {% if meal_of_day %}
     <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white py-8">
