@@ -386,7 +386,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50" data-store-type="{{ store_type }}">
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -515,7 +515,7 @@
                     All
                 </button>
                 {% for category in categories %}
-                <button data-category="{{ category.id }}" class="category-btn px-6 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-orange-50 border border-gray-200">
+                <button data-category="{{ category.id }}" data-name="{{ category.name }}" class="category-btn px-6 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-orange-50 border border-gray-200">
                     {{ category.icon }} {{ category.name }}
                 </button>
                 {% endfor %}
@@ -572,7 +572,7 @@
 
         <!-- All Food Items -->
         <div class="mb-8">
-            <h2 class="text-2xl font-bold mb-4" style="font-weight: 800; font-size: 2rem;">{% if store_type == 'liquor' %} All Drinks{% elif store_type == 'grocery' %} All Groceries{% else %}🍽️ All Meals{% endif %}</h2>
+            <h2 id="allItemsHeading" class="text-2xl font-bold mb-4" style="font-weight: 800; font-size: 2rem;">{% if store_type == 'liquor' %} All Drinks{% elif store_type == 'grocery' %} All Groceries{% else %}🍽️ All Meals{% endif %}</h2>
             {% if food_items %}
             <div id="foodGrid" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {% for item in food_items %}
@@ -1084,6 +1084,30 @@
             });
             button.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200');
             button.classList.add('bg-orange-600', 'text-white');
+
+            // Update heading based on selected category
+            const heading = document.getElementById('allItemsHeading');
+            const storeType = document.body.dataset.storeType;
+            let headingText = '';
+
+            if (categoryId === 'all') {
+                if (storeType === 'liquor') {
+                    headingText = 'All Drinks';
+                } else if (storeType === 'grocery') {
+                    headingText = 'All Groceries';
+                } else {
+                    headingText = '🍽️ All Meals';
+                }
+            } else {
+                const categoryName = button.dataset.name;
+                if (storeType === 'food') {
+                    headingText = `🍽️ All ${categoryName}`;
+                } else {
+                    headingText = `All ${categoryName}`;
+                }
+            }
+
+            heading.textContent = headingText;
         }
 
         // Search functionality
