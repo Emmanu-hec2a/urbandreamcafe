@@ -1,0 +1,435 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Liquor Dashboard - UrbanFoods Admin{% endblock %}
+
+{% block page_title %}Liquor Store Dashboard{% endblock %}
+
+{% block breadcrumb_active %}Liquor Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-5">
+    <!-- Today's Orders -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card p-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="value">{{ today_orders_count }}</div>
+                    <div class="label">Today's Orders</div>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Revenue -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card p-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="value">KES {{ today_revenue|floatformat:0 }}</div>
+                    <div class="label">Today's Revenue</div>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Orders -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card p-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="value">{{ pending_orders }}</div>
+                    <div class="label">Pending Orders</div>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Out for Delivery -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card p-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="value">{{ out_for_delivery }}</div>
+                    <div class="label">Out for Delivery</div>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Liquor Revenue Trend (Last 7 Days)</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshCharts()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Liquor Orders</h5>
+                <a href="{% url 'liquor_orders' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="recentOrdersList">
+                    <!-- Orders will be loaded here -->
+                </div>
+                <div class="text-center p-3" id="noOrdersMessage" style="display: none;">
+                    <i class="fas fa-wine-bottle fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No recent liquor orders</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Items and Weekly Stats -->
+<div class="row mb-4">
+    <!-- Popular Items Today -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-fire me-2"></i> Popular Liquor Items Today</h5>
+            </div>
+            <div class="card-body">
+                <div id="popularItemsList">
+                    {% for item in popular_today %}
+                    <div class="d-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded">
+                        <div>
+                            <h6 class="mb-1">{{ item.food_item__name }}</h6>
+                            <small class="text-muted">{{ item.total_quantity }} bottles sold</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success">KES {{ item.total_revenue|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-wine-bottle fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No liquor orders yet today</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Performance -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-week me-2"></i> This Week</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="p-3 bg-primary bg-opacity-10 rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Total Orders</small>
+                                    <span class="h4 mb-0 text-primary">{{ weekly_orders }}</span>
+                                </div>
+                                <i class="fas fa-wine-bottle fa-2x text-primary opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-3 bg-success bg-opacity-10 rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Total Revenue</small>
+                                    <span class="h4 mb-0 text-success">KES {{ weekly_revenue|floatformat:0 }}</span>
+                                </div>
+                                <i class="fas fa-dollar-sign fa-2x text-success opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-3 bg-warning bg-opacity-10 rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Average Order Value</small>
+                                    <span class="h4 mb-0 text-warning">
+                                        KES {% if weekly_orders > 0 %}{{ average_order_value|floatformat:0 }}{% else %}0{% endif %}
+                                    </span>
+                                </div>
+                                <i class="fas fa-chart-line fa-2x text-warning opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="admin-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i> Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'liquor_orders' %}?status=pending" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="title">View Pending</div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'liquor_orders' %}?status=preparing" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="title">Preparing</div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'liquor_orders' %}?status=out_for_delivery" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="title">Out for Delivery</div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'admin_liquor' %}" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="title">Manage Liquor Menu</div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'liquor_analytics' %}" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="title">View Analytics</div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'admin_dashboard' %}" class="quick-action-card">
+                    <div class="icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="title">Back to Main Dashboard</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let revenueChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    loadRecentOrders();
+});
+
+function initializeCharts() {
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+    fetch('/admin-panel/api/dashboard/stats/')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                showAlert('Failed to load dashboard data', 'danger');
+                return;
+            }
+
+            const revenueData = data.daily_revenue;
+
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: revenueData.map(item => {
+                        const date = new Date(item.day);
+                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Revenue (KES)',
+                            data: revenueData.map(item => item.revenue),
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Orders',
+                            data: revenueData.map(item => item.orders),
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            // update stats cards as well
+            updateStatsCards(data);
+        })
+        .catch(error => {
+            console.error('Error initializing chart:', error);
+            showAlert('Error loading dashboard', 'danger');
+        });
+}
+
+function loadRecentOrders() {
+    fetch('/admin-panel/api/orders/recent/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateRecentOrders(data.orders);
+            }
+        })
+        .catch(error => console.error('Error loading recent orders:', error));
+}
+
+function updateRecentOrders(orders) {
+    const list = document.getElementById('recentOrdersList');
+    const noOrders = document.getElementById('noOrdersMessage');
+
+    if (orders.length === 0) {
+        list.innerHTML = '';
+        noOrders.style.display = 'block';
+        return;
+    }
+
+    noOrders.style.display = 'none';
+
+    const ordersHtml = orders.map(order => `
+        <a href="/admin-panel/liquor/orders/${order.order_number}/" class="list-group-item list-group-item-action">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong class="text-primary">${order.order_number}</strong>
+                    <br>
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>${order.user}
+                        <i class="fas fa-clock ms-2 me-1"></i>${new Date(order.created_at).toLocaleString()}
+                    </small>
+                </div>
+                <div class="text-end">
+                    <span class="badge status-${order.status} mb-1">${order.status_display}</span>
+                    <br>
+                    <small class="text-success fw-bold">KES ${order.total}</small>
+                </div>
+            </div>
+        </a>
+    `).join('');
+
+    list.innerHTML = ordersHtml;
+}
+
+function refreshCharts() {
+    const button = event.target.closest('button');
+    const originalText = showLoading(button);
+
+    fetch('/admin-panel/api/dashboard/stats/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const revenueData = data.daily_revenue;
+
+                // Update chart
+                revenueChart.data.labels = revenueData.map(item => {
+                    const date = new Date(item.day);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                });
+                revenueChart.data.datasets[0].data = revenueData.map(item => item.revenue);
+                revenueChart.data.datasets[1].data = revenueData.map(item => item.orders);
+                revenueChart.update();
+
+                // Update stats cards
+                updateStatsCards(data);
+
+                showAlert('Dashboard refreshed successfully', 'success');
+            } else {
+                showAlert('Failed to refresh dashboard', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing dashboard:', error);
+            showAlert('Error refreshing dashboard', 'danger');
+        })
+        .finally(() => {
+            hideLoading(button, originalText);
+        });
+}
+
+function updateStatsCards(data) {
+    // Update stats cards with new data
+    const cards = document.querySelectorAll('.stats-card .value');
+    if (cards.length >= 4) {
+        cards[0].textContent = data.today_orders_count;
+        cards[1].textContent = `KES ${data.today_revenue}`;
+        cards[2].textContent = data.pending_orders;
+        cards[3].textContent = data.out_for_delivery;
+    }
+}
+</script>
+{% endblock %}

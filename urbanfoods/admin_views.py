@@ -114,6 +114,8 @@ def admin_dashboard(request):
     week_start = today - timedelta(days=today.weekday())
     weekly_orders = Order.objects.filter(created_at__date__gte=week_start)
     weekly_revenue = weekly_orders.aggregate(total=Sum('total'))['total'] or 0
+    weekly_order_count = weekly_orders.count()
+    average_order_value = weekly_revenue / weekly_order_count if weekly_order_count > 0 else 0
     revenue_trend = weekly_orders.annotate(day=TruncDate('created_at')).values('day').annotate(
         daily_revenue=Sum('total'),
         order_count=Count('id')
@@ -135,6 +137,7 @@ def admin_dashboard(request):
         'popular_today': popular_today,
         'weekly_orders': weekly_orders.count(),
         'weekly_revenue': weekly_revenue,
+        'average_order_value': average_order_value,
         'peak_hours': peak_hours,
         'revenue_trend': list(revenue_trend),
     }
@@ -329,6 +332,267 @@ def cancel_order(request):
         })
 
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+# ==================== LIQUOR ADMIN VIEWS ====================
+
+@staff_member_required(login_url='admin_login')
+def liquor_dashboard(request):
+    """Liquor store admin dashboard"""
+    # Check if this is an AJAX request for data refresh
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        today = timezone.now().date()
+
+        # Today's liquor statistics
+        today_orders = Order.objects.filter(
+            created_at__date=today,
+            items__food_item__store_type='liquor'
+        ).distinct()
+        today_revenue = OrderItem.objects.filter(
+            order__created_at__date=today,
+            food_item__store_type='liquor'
+        ).aggregate(total=Sum('price_at_order'))['total'] or 0
+        pending_orders = Order.objects.filter(
+            status='pending',
+            items__food_item__store_type='liquor'
+        ).distinct().count()
+        out_for_delivery = Order.objects.filter(
+            status='out_for_delivery',
+            items__food_item__store_type='liquor'
+        ).distinct().count()
+
+        # This week's liquor stats for revenue trend
+        week_start = today - timedelta(days=today.weekday())
+        weekly_orders = Order.objects.filter(
+            created_at__date__gte=week_start,
+            items__food_item__store_type='liquor'
+        ).distinct()
+        revenue_trend = OrderItem.objects.filter(
+            order__created_at__date__gte=week_start,
+            food_item__store_type='liquor'
+        ).annotate(day=TruncDate('order__created_at')).values('day').annotate(
+            revenue=Sum('price_at_order'),
+            orders=Count('order', distinct=True)
+        ).order_by('day')
+
+        return JsonResponse({
+            'success': True,
+            'today_orders_count': today_orders.count(),
+            'today_revenue': float(today_revenue),
+            'pending_orders': pending_orders,
+            'out_for_delivery': out_for_delivery,
+            'daily_revenue': list(revenue_trend)
+        })
+
+    # Regular page load
+    today = timezone.now().date()
+
+    # Today's liquor statistics
+    today_orders = Order.objects.filter(
+        created_at__date=today,
+        items__food_item__store_type='liquor'
+    ).distinct()
+    today_revenue = OrderItem.objects.filter(
+        order__created_at__date=today,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('price_at_order'))['total'] or 0
+    pending_orders = Order.objects.filter(
+        status='pending',
+        items__food_item__store_type='liquor'
+    ).distinct().count()
+    preparing_orders = Order.objects.filter(
+        status='preparing',
+        items__food_item__store_type='liquor'
+    ).distinct().count()
+    out_for_delivery = Order.objects.filter(
+        status='out_for_delivery',
+        items__food_item__store_type='liquor'
+    ).distinct().count()
+
+    # Popular liquor items today
+    popular_today = OrderItem.objects.filter(
+        order__created_at__date=today,
+        food_item__store_type='liquor'
+    ).values(
+        'food_item__name'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum('price_at_order')
+    ).order_by('-total_quantity')[:5]
+
+    # This week's liquor stats
+    week_start = today - timedelta(days=today.weekday())
+    weekly_orders = Order.objects.filter(
+        created_at__date__gte=week_start,
+        items__food_item__store_type='liquor'
+    ).distinct()
+    weekly_revenue = OrderItem.objects.filter(
+        order__created_at__date__gte=week_start,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('price_at_order'))['total'] or 0
+    weekly_order_count = weekly_orders.count()
+    average_order_value = weekly_revenue / weekly_order_count if weekly_order_count > 0 else 0
+    revenue_trend = OrderItem.objects.filter(
+        order__created_at__date__gte=week_start,
+        food_item__store_type='liquor'
+    ).annotate(day=TruncDate('order__created_at')).values('day').annotate(
+        daily_revenue=Sum('price_at_order'),
+        order_count=Count('order', distinct=True)
+    ).order_by('day')
+
+    # Peak hours (last 7 days) for liquor orders
+    peak_hours = Order.objects.filter(
+        created_at__gte=timezone.now() - timedelta(days=7),
+        items__food_item__store_type='liquor'
+    ).distinct().annotate(hour=ExtractHour('created_at')).values('hour').annotate(
+        order_count=Count('id')
+    ).order_by('-order_count')[:5]
+
+    context = {
+        'today_orders_count': today_orders.count(),
+        'today_revenue': today_revenue,
+        'pending_orders': pending_orders,
+        'preparing_orders': preparing_orders,
+        'out_for_delivery': out_for_delivery,
+        'popular_today': popular_today,
+        'weekly_orders': weekly_orders.count(),
+        'weekly_revenue': weekly_revenue,
+        'average_order_value': average_order_value,
+        'peak_hours': peak_hours,
+        'revenue_trend': list(revenue_trend),
+        'store_type': 'liquor',
+    }
+
+    return render(request, 'custom_admin/liquor_dashboard.html', context)
+
+@staff_member_required(login_url='admin_login')
+def liquor_orders(request):
+    """Liquor order management page"""
+    status_filter = request.GET.get('status', 'all')
+
+    orders = Order.objects.filter(
+        items__food_item__store_type='liquor'
+    ).distinct().select_related('user').prefetch_related('items')
+
+    if status_filter != 'all':
+        orders = orders.filter(status=status_filter)
+
+    # Recent orders first
+    orders = orders.order_by('-created_at')
+
+    context = {
+        'orders': orders[:50],  # Limit to recent 50
+        'status_filter': status_filter,
+        'store_type': 'liquor',
+    }
+
+    return render(request, 'custom_admin/liquor_orders.html', context)
+
+@staff_member_required(login_url='admin_login')
+def liquor_analytics(request):
+    """Liquor analytics and reports"""
+    # Date range
+    days = int(request.GET.get('days', 7))
+    start_date = timezone.now() - timedelta(days=days)
+
+    # Liquor revenue over time
+    daily_revenue = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor',
+        order__status='delivered'
+    ).annotate(day=TruncDate('order__created_at')).values('day').annotate(
+        revenue=Sum('price_at_order'),
+        orders=Count('order', distinct=True)
+    ).order_by('day')
+
+    # Top selling liquor items
+    top_items = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).values(
+        'food_item__name',
+        'food_item__category__name',
+        'food_item__bottle_size'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum('price_at_order')
+    ).order_by('-total_quantity')[:10]
+
+    # Top liquor customers
+    top_customers = Order.objects.filter(
+        created_at__gte=start_date,
+        status='delivered',
+        items__food_item__store_type='liquor'
+    ).distinct().values(
+        'user__username',
+        'user__phone_number'
+    ).annotate(
+        total_orders=Count('id'),
+        total_spent=Sum('total')
+    ).order_by('-total_orders')[:10]
+
+    # Liquor order status distribution
+    status_distribution = Order.objects.filter(
+        created_at__gte=start_date,
+        items__food_item__store_type='liquor'
+    ).distinct().values('status').annotate(
+        count=Count('id')
+    )
+
+    # Calculate totals
+    total_revenue = sum(float(item['revenue'] or 0) for item in daily_revenue)
+    total_orders = sum(item['orders'] for item in daily_revenue)
+    avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+
+    # Peak hours for liquor orders
+    peak_hours = Order.objects.filter(
+        created_at__gte=start_date,
+        items__food_item__store_type='liquor'
+    ).distinct().annotate(hour=ExtractHour('created_at')).values('hour').annotate(
+        order_count=Count('id')
+    ).order_by('-order_count')[:10]
+
+    # Liquor-specific metrics
+    liquor_orders = Order.objects.filter(
+        created_at__gte=start_date,
+        items__food_item__store_type='liquor'
+    ).distinct()
+
+    liquor_revenue = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('price_at_order'))['total'] or 0
+
+    liquor_items_sold = OrderItem.objects.filter(
+        order__created_at__gte=start_date,
+        food_item__store_type='liquor'
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    # Top selling liquor items (already calculated above)
+    top_liquor_items = top_items
+
+    # Liquor revenue trend (already calculated above)
+    liquor_daily_revenue = daily_revenue
+
+    context = {
+        'daily_revenue': json.dumps(list(daily_revenue), default=str),
+        'top_items': json.dumps(list(top_items), default=str),
+        'top_customers': json.dumps(list(top_customers), default=str),
+        'status_distribution': json.dumps(list(status_distribution), default=str),
+        'days': days,
+        'total_revenue': total_revenue,
+        'total_orders': total_orders,
+        'avg_order_value': avg_order_value,
+        'peak_hours': json.dumps(list(peak_hours), default=str),
+        # Liquor metrics
+        'liquor_revenue': liquor_revenue,
+        'liquor_orders_count': liquor_orders.count(),
+        'liquor_items_sold': liquor_items_sold,
+        'top_liquor_items': json.dumps(list(top_liquor_items), default=str),
+        'liquor_daily_revenue': json.dumps(list(liquor_daily_revenue), default=str),
+        'store_type': 'liquor',
+    }
+
+    return render(request, 'custom_admin/liquor_analytics.html', context)
 
 # ==================== FOOD MENU MANAGEMENT ====================
 
@@ -617,9 +881,10 @@ def admin_analytics(request):
         orders=Count('id')
     ).order_by('day')
 
-    # Top selling items
+    # Top selling items (food and grocery only)
     top_items = OrderItem.objects.filter(
-        order__created_at__gte=start_date
+        order__created_at__gte=start_date,
+        food_item__store_type__in=['food', 'grocery']
     ).values(
         'food_item__name',
         'food_item__category__name'

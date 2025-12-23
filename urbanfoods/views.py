@@ -294,7 +294,11 @@ def place_order(request):
 
     # Calculate totals
     subtotal = cart.total
-    delivery_fee = 0  # Free campus delivery
+
+    # Set delivery fee based on store type - KES 20 for food orders, free for others
+    store_type = cart.items.first().food_item.store_type if cart.items.exists() else 'food'
+    delivery_fee = 20 if store_type == 'food' else 0
+
     total = subtotal + delivery_fee
 
     # Create order

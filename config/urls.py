@@ -57,10 +57,15 @@ urlpatterns = [
     path('admin-panel/api/orders/new/', admin_views.get_new_orders, name='get_new_orders'),
     path('admin-panel/api/orders/update-status/', admin_views.update_order_status, name='update_order_status'),
     path('admin-panel/api/orders/cancel/', admin_views.cancel_order, name='cancel_order'),
-    
+
+    # Liquor admin
+    path('admin-panel/liquor/', admin_views.admin_liquor, name='admin_liquor'),
+    path('admin-panel/liquor/dashboard/', admin_views.liquor_dashboard, name='liquor_dashboard'),
+    path('admin-panel/liquor/orders/', admin_views.liquor_orders, name='liquor_orders'),
+    path('admin-panel/liquor/analytics/', admin_views.liquor_analytics, name='liquor_analytics'),
+
     # Menu management
     path('admin-panel/menu/', admin_views.admin_menu, name='admin_menu'),
-    path('admin-panel/liquor/', admin_views.admin_liquor, name='admin_liquor'),
     path('admin-panel/grocery/', admin_views.admin_grocery, name='admin_grocery'),
     path('admin-panel/api/menu/toggle-availability/', admin_views.toggle_food_availability, name='toggle_food_availability'),
     path('admin-panel/api/menu/update-price/', admin_views.update_food_price, name='update_food_price'),

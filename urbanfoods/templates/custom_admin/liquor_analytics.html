@@ -1,16 +1,16 @@
 {% extends 'custom_admin/base.html' %}
 {% load static %}
 
-{% block title %}Analytics - UrbanFoods Admin{% endblock %}
+{% block title %}Liquor Analytics - UrbanFoods Admin{% endblock %}
 
-{% block page_title %}Analytics & Reports{% endblock %}
+{% block page_title %}🍷 Liquor Analytics & Reports{% endblock %}
 
-{% block breadcrumb_active %}Analytics{% endblock %}
+{% block breadcrumb_active %}Liquor Analytics{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800" style="color: #2d3748 !important;">Analytics & Reports</h1>
+    <h1 class="h3 mb-0 text-gray-800" style="color: #2d3748 !important;">🍷 Liquor Analytics & Reports</h1>
     <div class="d-flex gap-2">
       <select class="form-select form-select-sm" id="timeRange" onchange="changeTimeRange()" style="width: auto;">
         <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
@@ -29,10 +29,10 @@
       <div class="admin-card p-4">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-muted mb-1">Total Revenue</h6>
-            <h4 class="mb-0 text-success">KES {{ total_revenue|floatformat:2 }}</h4>
+            <h6 class="text-muted mb-1">Liquor Revenue</h6>
+            <h4 class="mb-0 text-success">KES {{ liquor_revenue|floatformat:2 }}</h4>
           </div>
-          <i class="fas fa-dollar-sign fa-2x text-success opacity-75"></i>
+          <i class="fas fa-wine-bottle fa-2x text-success opacity-75"></i>
         </div>
       </div>
     </div>
@@ -41,8 +41,8 @@
       <div class="admin-card p-4">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-muted mb-1">Total Orders</h6>
-            <h4 class="mb-0 text-primary">{{ total_orders }}</h4>
+            <h6 class="text-muted mb-1">Liquor Orders</h6>
+            <h4 class="mb-0 text-primary">{{ liquor_orders_count }}</h4>
           </div>
           <i class="fas fa-shopping-cart fa-2x text-primary opacity-75"></i>
         </div>
@@ -53,8 +53,8 @@
       <div class="admin-card p-4">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-muted mb-1">Avg Order Value</h6>
-            <h4 class="mb-0 text-info">KES {{ avg_order_value|floatformat:2 }}</h4>
+            <h6 class="text-muted mb-1">Items Sold</h6>
+            <h4 class="mb-0 text-info">{{ liquor_items_sold }}</h4>
           </div>
           <i class="fas fa-chart-line fa-2x text-info opacity-75"></i>
         </div>
@@ -65,7 +65,7 @@
       <div class="admin-card p-4">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-muted mb-1">Top Item</h6>
+            <h6 class="text-muted mb-1">Top Liquor Item</h6>
             <h5 class="mb-0 text-warning" id="topItemName">N/A</h5>
           </div>
           <i class="fas fa-trophy fa-2x text-warning opacity-75"></i>
@@ -74,15 +74,13 @@
     </div>
   </div>
 
-
-
 <!-- Charts Row -->
 <div class="row mb-4">
     <!-- Revenue Chart -->
     <div class="col-lg-8 mb-4">
         <div class="admin-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Revenue Trend</h5>
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Liquor Revenue Trend</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -96,7 +94,7 @@
     <div class="col-lg-4 mb-4">
         <div class="admin-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Order Status</h5>
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Liquor Order Status</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -109,41 +107,39 @@
 
 <!-- Top Items and Customers -->
 <div class="row mb-4">
-    <!-- Top Selling Items -->
+    <!-- Top Selling Liquor Items -->
     <div class="col-lg-6 mb-4">
         <div class="admin-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-fire me-2"></i> Top Selling Items (Food)</h5>
+                <h5 class="mb-0"><i class="fas fa-wine-bottle me-2"></i> Top Selling Liquor Items</h5>
             </div>
             <div class="card-body">
                 <div id="topItemsList">
-                    <!-- Top items will be populated by JavaScript -->
+                    <!-- Top liquor items will be populated by JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Top Customers -->
+    <!-- Top Liquor Customers -->
     <div class="col-lg-6 mb-4">
         <div class="admin-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-users me-2"></i> Top Customers</h5>
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i> Top Liquor Customers</h5>
             </div>
             <div class="card-body">
                 <div id="topCustomersList">
-                    <!-- Top customers will be populated by JavaScript -->
+                    <!-- Top liquor customers will be populated by JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-
 <!-- Peak Hours -->
 <div class="admin-card">
     <div class="card-header">
-        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Peak Order Hours</h5>
+        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Peak Liquor Order Hours</h5>
     </div>
     <div class="card-body">
         <div class="chart-container">
@@ -155,7 +151,7 @@
 
 {% block extra_js %}
 <script>
-let revenueChart, statusChart, peakHoursChart, liquorRevenueChart;
+let revenueChart, statusChart, peakHoursChart;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeCharts();
@@ -163,12 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeCharts() {
     // Parse data
-    const revenueData = JSON.parse('{{ daily_revenue|escapejs }}');
+    const revenueData = JSON.parse('{{ liquor_daily_revenue|escapejs }}');
     const statusData = JSON.parse('{{ status_distribution|escapejs }}');
     const peakHoursData = JSON.parse('{{ peak_hours|escapejs }}');
-    const topItemsData = JSON.parse('{{ top_items|escapejs }}');
+    const topItemsData = JSON.parse('{{ top_liquor_items|escapejs }}');
     const topCustomersData = JSON.parse('{{ top_customers|escapejs }}');
-
 
     // Revenue Chart
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
@@ -181,17 +176,17 @@ function initializeCharts() {
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }),
             datasets: [{
-                label: 'Revenue (KES)',
+                label: 'Liquor Revenue (KES)',
                 data: revenueData.map(item => item.revenue),
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderColor: '#8B4513',
+                backgroundColor: 'rgba(139, 69, 19, 0.1)',
                 tension: 0.4,
                 fill: true
             }, {
-                label: 'Orders',
+                label: 'Liquor Orders',
                 data: revenueData.map(item => item.orders),
-                borderColor: '#764ba2',
-                backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                borderColor: '#DC143C',
+                backgroundColor: 'rgba(220, 20, 60, 0.1)',
                 tension: 0.4,
                 fill: true
             }]
@@ -262,10 +257,10 @@ function initializeCharts() {
         data: {
             labels: peakHoursData.map(item => `${item.hour}:00`),
             datasets: [{
-                label: 'Orders',
+                label: 'Liquor Orders',
                 data: peakHoursData.map(item => item.order_count),
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(139, 69, 19, 0.6)',
+                borderColor: 'rgba(139, 69, 19, 1)',
                 borderWidth: 1
             }]
         },
@@ -288,8 +283,6 @@ function initializeCharts() {
         }
     });
 
-
-
     // Set top item name in metrics card
     const topItemName = document.getElementById('topItemName');
     if (topItemsData.length > 0) {
@@ -297,8 +290,6 @@ function initializeCharts() {
     } else {
         topItemName.textContent = 'N/A';
     }
-
-
 
     // Populate Top Items List
     const topItemsList = document.getElementById('topItemsList');
@@ -309,7 +300,7 @@ function initializeCharts() {
             itemDiv.innerHTML = `
                 <div>
                     <h6 class="mb-1">${item.food_item__name}</h6>
-                    <small class="text-muted">${item.food_item__category__name}</small>
+                    <small class="text-muted">${item.food_item__category__name} - ${item.food_item__bottle_size}</small>
                 </div>
                 <div class="text-end">
                     <span class="badge bg-primary">${item.total_quantity} sold</span>
@@ -322,8 +313,8 @@ function initializeCharts() {
     } else {
         topItemsList.innerHTML = `
             <div class="text-center py-4">
-                <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
-                <p class="text-muted mb-0">No sales data available</p>
+                <i class="fas fa-wine-bottle fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No liquor sales data available</p>
             </div>
         `;
     }
@@ -351,7 +342,7 @@ function initializeCharts() {
         topCustomersList.innerHTML = `
             <div class="text-center py-4">
                 <i class="fas fa-users fa-2x text-muted mb-2"></i>
-                <p class="text-muted mb-0">No customer data available</p>
+                <p class="text-muted mb-0">No liquor customer data available</p>
             </div>
         `;
     }
@@ -367,23 +358,23 @@ function exportReport() {
 
     // Create a simple CSV export
     const data = {
-        daily_revenue: JSON.parse('{{ daily_revenue|escapejs }}'),
-        top_items: JSON.parse('{{ top_items|escapejs }}'),
+        liquor_daily_revenue: JSON.parse('{{ liquor_daily_revenue|escapejs }}'),
+        top_liquor_items: JSON.parse('{{ top_liquor_items|escapejs }}'),
         top_customers: JSON.parse('{{ top_customers|escapejs }}'),
         status_distribution: JSON.parse('{{ status_distribution|escapejs }}')
     };
 
-    let csv = 'Date,Revenue,Orders\n';
-    data.daily_revenue.forEach(item => {
+    let csv = 'Date,Liquor Revenue,Liquor Orders\n';
+    data.liquor_daily_revenue.forEach(item => {
         csv += `${item.day},${item.revenue},${item.orders}\n`;
     });
 
-    csv += '\nTop Items\nName,Category,Quantity,Revenue\n';
-    data.top_items.forEach(item => {
-        csv += `${item.food_item__name},${item.food_item__category__name},${item.total_quantity},${item.total_revenue}\n`;
+    csv += '\nTop Liquor Items\nName,Category,Bottle Size,Quantity,Revenue\n';
+    data.top_liquor_items.forEach(item => {
+        csv += `${item.food_item__name},${item.food_item__category__name},${item.food_item__bottle_size},${item.total_quantity},${item.total_revenue}\n`;
     });
 
-    csv += '\nTop Customers\nUsername,Phone,Orders,Total Spent\n';
+    csv += '\nTop Liquor Customers\nUsername,Phone,Orders,Total Spent\n';
     data.top_customers.forEach(customer => {
         csv += `${customer.user__username},${customer.user__phone_number},${customer.total_orders},${customer.total_spent}\n`;
     });
@@ -393,11 +384,11 @@ function exportReport() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `urbanfoods-analytics-${days}days.csv`;
+    a.download = `urbanfoods-liquor-analytics-${days}days.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
 
-    showAlert('Report exported successfully!', 'success');
+    showAlert('Liquor report exported successfully!', 'success');
 }
 </script>
 {% endblock %}

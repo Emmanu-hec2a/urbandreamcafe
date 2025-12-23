@@ -1,0 +1,328 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Liquor Orders - UrbanFoods Admin{% endblock %}
+
+{% block page_title %}Liquor Order Management{% endblock %}
+
+{% block breadcrumb_active %}Liquor Orders{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" style="color: #2d3748;">🍷 Liquor Order Management</h4>
+    <div class="d-flex gap-2">
+        <select class="form-select" id="statusFilter" onchange="filterOrders()">
+            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Orders</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="preparing" {% if status_filter == 'preparing' %}selected{% endif %}>Preparing</option>
+            <option value="ready" {% if status_filter == 'ready' %}selected{% endif %}>Ready</option>
+            <option value="out_for_delivery" {% if status_filter == 'out_for_delivery' %}selected{% endif %}>Out for Delivery</option>
+            <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option>
+            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+        <button class="btn btn-outline-primary" onclick="refreshOrders()">
+            <i class="fas fa-sync-alt me-1"></i>
+            Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="admin-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="ordersTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    {% for order in orders %}
+                    <tr data-order-id="{{ order.id }}">
+                        <td>
+                            <strong class="text-primary">{{ order.order_number }}</strong>
+                        </td>
+                        <td>
+                            <div>
+                                <strong>{{ order.user.username }}</strong>
+                                <br>
+                                <small class="text-muted">{{ order.user.phone_number }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="order-items">
+                                {% for item in order.items.all %}
+                                <div class="mb-1">
+                                    <small>{{ item.quantity }}x {{ item.food_item.name }} ({{ item.food_item.bottle_size }})</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <strong>KES {{ order.total|floatformat:0 }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge status-{{ order.status }} fs-6">{{ order.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <div>
+                                <small>{{ order.created_at|date:"M d, H:i" }}</small>
+                                {% if order.estimated_delivery %}
+                                <br>
+                                <small class="text-muted">Est: {{ order.estimated_delivery|date:"H:i" }}</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'admin_order_detail' order.order_number %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% if order.status == 'pending' %}
+                                        <li><a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_number }}', 'confirmed')">
+                                            <i class="fas fa-check text-success me-2"></i>Confirm Order
+                                        </a></li>
+                                        {% endif %}
+                                        {% if order.status == 'confirmed' %}
+                                        <li><a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_number }}', 'preparing')">
+                                            <i class="fas fa-utensils text-warning me-2"></i>Start Preparing
+                                        </a></li>
+                                        {% endif %}
+                                        {% if order.status == 'preparing' %}
+                                        <li><a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_number }}', 'ready')">
+                                            <i class="fas fa-check-circle text-info me-2"></i>Mark Ready
+                                        </a></li>
+                                        {% endif %}
+                                        {% if order.status == 'ready' %}
+                                        <li><a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_number }}', 'out_for_delivery')">
+                                            <i class="fas fa-truck text-primary me-2"></i>Out for Delivery
+                                        </a></li>
+                                        {% endif %}
+                                        {% if order.status == 'out_for_delivery' %}
+                                        <li><a class="dropdown-item" href="#" onclick="updateOrderStatus('{{ order.order_number }}', 'delivered')">
+                                            <i class="fas fa-box-open text-success me-2"></i>Mark Delivered
+                                        </a></li>
+                                        {% endif %}
+                                        {% if order.status not in 'delivered,cancelled' %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="cancelOrder('{{ order.order_number }}')">
+                                            <i class="fas fa-times me-2"></i>Cancel Order
+                                        </a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-wine-bottle fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No liquor orders found</h5>
+                            <p class="text-muted">Liquor orders will appear here once customers start placing them.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Order Status Update Modal -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Liquor Order Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="statusUpdateForm">
+                    <div class="mb-3">
+                        <label for="statusNotes" class="form-label">Notes (optional)</label>
+                        <textarea class="form-control" id="statusNotes" rows="3" placeholder="Add any notes about this status update..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusUpdate">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Liquor Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this liquor order? This action cannot be undone.</p>
+                <div class="mb-3">
+                    <label for="cancelReason" class="form-label">Reason for cancellation</label>
+                    <select class="form-select" id="cancelReason">
+                        <option value="Customer requested">Customer requested</option>
+                        <option value="Items unavailable">Items unavailable</option>
+                        <option value="Age verification failed">Age verification failed</option>
+                        <option value="Payment issue">Payment issue</option>
+                        <option value="Technical issue">Technical issue</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="cancelNotes" class="form-label">Additional notes (optional)</label>
+                    <textarea class="form-control" id="cancelNotes" rows="2" placeholder="Any additional information..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Order</button>
+                <button type="button" class="btn btn-danger" id="confirmCancelOrder">Cancel Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentOrderNumber = null;
+let currentNewStatus = null;
+
+function filterOrders() {
+    const status = document.getElementById('statusFilter').value;
+    window.location.href = `?status=${status}`;
+}
+
+function refreshOrders() {
+    window.location.reload();
+}
+
+function updateOrderStatus(orderNumber, newStatus) {
+    currentOrderNumber = orderNumber;
+    currentNewStatus = newStatus;
+
+    const modal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+    modal.show();
+}
+
+function cancelOrder(orderNumber) {
+    currentOrderNumber = orderNumber;
+
+    const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+    modal.show();
+}
+
+document.getElementById('confirmStatusUpdate').addEventListener('click', function() {
+    const notes = document.getElementById('statusNotes').value;
+
+    const button = this;
+    const originalText = showLoading(button);
+
+    fetch('/admin-panel/api/orders/update-status/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            order_number: currentOrderNumber,
+            status: currentNewStatus,
+            notes: notes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showAlert('Failed to update order status', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating order status:', error);
+        showAlert('Error updating order status', 'danger');
+    })
+    .finally(() => {
+        hideLoading(button, originalText);
+        bootstrap.Modal.getInstance(document.getElementById('statusUpdateModal')).hide();
+    });
+});
+
+document.getElementById('confirmCancelOrder').addEventListener('click', function() {
+    const reason = document.getElementById('cancelReason').value;
+    const notes = document.getElementById('cancelNotes').value;
+
+    const button = this;
+    const originalText = showLoading(button);
+
+    fetch('/admin-panel/api/orders/cancel/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            order_number: currentOrderNumber,
+            reason: reason + (notes ? ': ' + notes : '')
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showAlert('Failed to cancel order', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error cancelling order:', error);
+        showAlert('Error cancelling order', 'danger');
+    })
+    .finally(() => {
+        hideLoading(button, originalText);
+        bootstrap.Modal.getInstance(document.getElementById('cancelOrderModal')).hide();
+    });
+});
+
+// Auto-refresh orders every 30 seconds
+setInterval(() => {
+    if (document.visibilityState === 'visible') {
+        // Only refresh if page is visible
+        fetch('/admin-panel/api/orders/new/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.new_orders_count > 0) {
+                    // Show notification about new orders
+                    showAlert(`${data.new_orders_count} new liquor order(s) received!`, 'info');
+                    // Optionally refresh the page or update the table
+                }
+            })
+            .catch(error => console.error('Error checking for new orders:', error));
+    }
+}, 30000);
+</script>
+{% endblock %}

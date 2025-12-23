@@ -668,7 +668,7 @@
                 </div>
                 <div class="flex justify-between mb-2">
                     <span>Delivery Fee:</span>
-                    <span id="cartDeliveryFee" class="font-semibold"><b>FREE</b></span>
+                    <span id="cartDeliveryFee" class="font-semibold"><b>{% if store_type == 'food' %}KES 20{% else %}FREE{% endif %}</b></span>
                 </div>
                 <div class="flex justify-between text-xl font-bold border-t pt-2">
                     <span>Total:</span>
@@ -867,7 +867,7 @@
                 `).join('');
                 
                 document.getElementById('cartSubtotal').textContent = `KES ${cartData.subtotal}`;
-                document.getElementById('cartTotal').textContent = `KES ${cartData.total}`; // Assuming flat delivery fee of 20
+                document.getElementById('cartTotal').textContent = `KES ${cartData.total + 20}`; // Assuming flat delivery fee of 20
             }
         }
 
