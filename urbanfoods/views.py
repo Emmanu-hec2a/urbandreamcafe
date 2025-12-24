@@ -11,6 +11,10 @@ import json
 
 # ==================== HOMEPAGE & FOOD CATALOG ====================
 
+def offline(request):
+    """Offline page for PWA"""
+    return render(request, 'offline.html')
+
 def homepage(request):
     """Main food catalog page"""
     # Get store type from session or default to 'food'

@@ -7,6 +7,7 @@ app_name = 'urbanfoods'
 urlpatterns = [
     # Public pages
     path('', views.homepage, name='homepage'),
+    path('offline/', views.offline, name='offline'),
 
     # Authentication
     path('signup/', views.signup_view, name='signup'),

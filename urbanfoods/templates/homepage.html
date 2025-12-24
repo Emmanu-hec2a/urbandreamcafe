@@ -7,6 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UrbanDreamsCafe</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="manifest" href="{% static 'urbanfoods/manifest.json' %}">
+    <meta name="theme-color" content="#ff6600">
+
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}">
+
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}">
+    
+    <!-- Microsoft/Edge specific -->
+    <meta name="msapplication-TileColor" content="#ea580c">
+    <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
+    <meta name="application-name" content="Urban Dreams Cafe">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
@@ -768,6 +784,52 @@
         <span id="toastMessage"></span>
     </div>
 
+    {% if user.is_authenticated %}
+    <!-- Enhanced PWA Install Popup -->
+    <div id="pwaInstallPopup" class="pwa-install-popup hidden fixed bottom-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 max-w-xs animate-fade-in">
+        <div class="flex items-center gap-3">
+            <div class="flex-shrink-0">
+                <img src="{% static 'images/favicon.png' %}" alt="UDC" class="w-10 h-10 rounded-lg">
+            </div>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-900 text-sm">Install Urban Dreams Cafe</h3>
+                <p class="text-gray-600 text-xs mt-1">Order faster with the app!</p>
+                <div class="flex items-center gap-1 mt-1">
+                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                    <span class="text-xs text-gray-500">4.8 • Free</span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1">
+                <button id="installBtn" class="bg-orange-600 text-white px-3 py-1.5 rounded text-xs hover:bg-orange-700 font-medium transition-colors">
+                    Install
+                </button>
+                <button id="dismissBtn" class="text-gray-500 hover:text-gray-700 text-xs transition-colors">
+                    Later
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Install Bar (alternative for some browsers) -->
+    <div id="miniInstallBar" class="mini-install-bar hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-4 z-50 shadow-lg">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center gap-3">
+                <img src="{% static 'images/favicon.png' %}" alt="UDC" class="w-6 h-6 rounded">
+                <span class="text-sm font-medium">Install Urban Dreams Cafe for a better experience</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="miniInstallBtn" class="bg-white text-orange-600 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100 transition-colors">
+                    Install
+                </button>
+                <button id="miniDismissBtn" class="text-white hover:text-gray-200 text-sm transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
     <script>
         // Function to generate star rating HTML
         function generateStarRating(rating, reviewCount) {
@@ -1184,6 +1246,14 @@
             }, 3000);
         }
 
+        // Dismiss delivery banner
+        function dismissBanner() {
+            const banner = document.getElementById('delivery-banner');
+            if (banner) {
+                banner.style.display = 'none';
+            }
+        }
+
         // Get CSRF token
         function getCookie(name) {
             let cookieValue = null;
@@ -1370,6 +1440,89 @@
             }
         });
         {% endif %}
+
+        // ==================== PWA INSTALL PROMPT ====================
+
+        let deferredPrompt;
+
+        // Handle install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install popup if user is authenticated
+            {% if user.is_authenticated %}
+            const installPopup = document.getElementById('pwaInstallPopup');
+            if (installPopup) {
+                installPopup.classList.remove('hidden');
+            }
+            {% endif %}
+        });
+
+        // Handle install button click
+        document.addEventListener('DOMContentLoaded', () => {
+            const installBtn = document.getElementById('installBtn');
+            const dismissBtn = document.getElementById('dismissBtn');
+
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    const installPopup = document.getElementById('pwaInstallPopup');
+                    if (installPopup) {
+                        installPopup.classList.add('hidden');
+                    }
+
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                    }
+                });
+            }
+
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', () => {
+                    const installPopup = document.getElementById('pwaInstallPopup');
+                    if (installPopup) {
+                        installPopup.classList.add('hidden');
+                    }
+                    // Don't show again for 24 hours
+                    localStorage.setItem('pwa_dismissed', Date.now().toString());
+                });
+            }
+        });
+
+        // Handle successful installation
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            const installPopup = document.getElementById('pwaInstallPopup');
+            if (installPopup) {
+                installPopup.classList.add('hidden');
+            }
+        });
+
+        // Check if we should show the popup (not dismissed recently)
+        document.addEventListener('DOMContentLoaded', () => {
+            {% if user.is_authenticated %}
+            const dismissedTime = localStorage.getItem('pwa_dismissed');
+            if (dismissedTime) {
+                const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
+                if (hoursSinceDismissed < 24) {
+                    return; // Don't show if dismissed within 24 hours
+                }
+            }
+            {% endif %}
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("{% static 'urbanfoods/service-worker.js' %}")
+            .then(reg => console.log("Service Worker registered!", reg))
+            .catch(err => console.error("Service Worker registration failed:", err));
+        }
     </script>
 </body>
 </html>
