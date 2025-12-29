@@ -54726,3 +54726,78 @@ C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
+"GET /password_reset/done/ HTTP/1.1" 500 59
+"GET /favicon.ico HTTP/1.1" 500 59
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /password_reset/done/ HTTP/1.1" 200 4597
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /password_reset/ HTTP/1.1" 200 5969
+"GET /login/ HTTP/1.1" 200 13388
+"GET /signup/ HTTP/1.1" 200 31354
+"POST /signup/ HTTP/1.1" 200 78
+"GET / HTTP/1.1" 200 121465
+"GET /static/urbanfoods/service-worker.js HTTP/1.1" 304 0
+"GET /api/cart/ HTTP/1.1" 200 97
+"GET / HTTP/1.1" 200 121465
+"GET /profile/ HTTP/1.1" 200 34352
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 13388
+"GET /password_reset/ HTTP/1.1" 200 5969
+Internal Server Error: /password_reset/
+Traceback (most recent call last):
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\contrib\auth\views.py", line 242, in dispatch
+    return super().dispatch(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\views\generic\edit.py", line 153, in post
+    return self.form_valid(form)
+           ~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\contrib\auth\views.py", line 255, in form_valid
+    form.save(**opts)
+    ~~~~~~~~~^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\contrib\auth\forms.py", line 376, in save
+    self.send_mail(
+    ~~~~~~~~~~~~~~^
+        subject_template_name,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        html_email_template_name=html_email_template_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\contrib\auth\forms.py", line 317, in send_mail
+    email_message.send()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\mail\message.py", line 298, in send
+    return self.get_connection(fail_silently).send_messages([self])
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\mail\backends\smtp.py", line 134, in send_messages
+    sent = self._send(message)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\mail\backends\smtp.py", line 152, in _send
+    self.connection.sendmail(
+    ~~~~~~~~~~~~~~~~~~~~~~~~^
+        from_email, recipients, message.as_bytes(linesep="\r\n")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Python313\Lib\smtplib.py", line 876, in sendmail
+    raise SMTPSenderRefused(code, resp, from_addr)
+smtplib.SMTPSenderRefused: (530, b'5.7.0 Authentication Required. For more information, go to\n5.7.0  https://support.google.com/accounts/troubleshooter/2402620. ffacd0b85a97d-4324ea22674sm64387882f8f.10 - gsmtp', 'None')
+"POST /password_reset/ HTTP/1.1" 500 142260
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
