@@ -54542,3 +54542,161 @@ Watching for file changes with StatReloader
 "GET /admin-panel/login/?next=/admin-panel/api/orders/new/%3Flast_check%3D2025-12-23T21%3A56%3A55.203027%2B00%3A00 HTTP/1.1" 200 43266
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 500 59
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 302 0
+"GET /admin-panel/login/?next=/admin-panel/api/orders/new/%3Flast_check%3D2025-12-23T21%3A56%3A55.203027%2B00%3A00 HTTP/1.1" 200 43266
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 302 0
+"GET /admin-panel/login/?next=/admin-panel/api/orders/new/%3Flast_check%3D2025-12-23T21%3A56%3A55.203027%2B00%3A00 HTTP/1.1" 200 43266
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 302 0
+"GET /admin-panel/login/?next=/admin-panel/api/orders/new/%3Flast_check%3D2025-12-23T21%3A56%3A55.203027%2B00%3A00 HTTP/1.1" 200 43266
+"GET /admin-panel/api/orders/new/?last_check=2025-12-23T21:56:55.203027+00:00 HTTP/1.1" 302 0
+"GET /admin-panel/login/?next=/admin-panel/api/orders/new/%3Flast_check%3D2025-12-23T21%3A56%3A55.203027%2B00%3A00 HTTP/1.1" 200 43266
+"GET /login/?next=/profile/ HTTP/1.1" 200 13373
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /login/?next=/profile/ HTTP/1.1" 200 13373
+"GET /signup/ HTTP/1.1" 200 31354
+"GET /login/ HTTP/1.1" 200 13373
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /login/ HTTP/1.1" 200 13373
+"GET /login/ HTTP/1.1" 200 13373
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 9791
+Internal Server Error: /login/
+Traceback (most recent call last):
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\PC\Desktop\UrbanFoods\urbanfoods\views.py", line 162, in login_view
+    return render(request, 'login.html')
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\urls\resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'password_reset' not found. 'password_reset' is not a valid view function or pattern name.
+"GET /login/ HTTP/1.1" 500 119015
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /login/ HTTP/1.1" 200 13399
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+Not Found: /login/password_reset_confirm.html
+"GET /login/password_reset_confirm.html HTTP/1.1" 404 9746
+Not Found: /login/password_reset_confirm.html
+"GET /login/password_reset_confirm.html HTTP/1.1" 404 9746
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /login/ HTTP/1.1" 200 13421
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+Not Found: /urbanfoods/templates/password_reset_confirm.html
+"GET /urbanfoods/templates/password_reset_confirm.html HTTP/1.1" 404 9791
+Watching for file changes with StatReloader
+"GET /login/ HTTP/1.1" 200 13388
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /password_reset/ HTTP/1.1" 200 5969
+"POST /password_reset/ HTTP/1.1" 302 0
+Internal Server Error: /password_reset/done/
+Traceback (most recent call last):
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "C:\Users\PC\AppData\Roaming\Python\Python313\site-packages\django\template\loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: password_reset_done.html
+"GET /password_reset/done/ HTTP/1.1" 500 84435
+"GET /password_reset/done/ HTTP/1.1" 200 4574
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /password_reset/ HTTP/1.1" 200 5969
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset/done/ HTTP/1.1" 200 4574
+C:\Users\PC\Desktop\UrbanFoods\config\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /password_reset/done/ HTTP/1.1" 200 4574
+"GET /password_reset/ HTTP/1.1" 200 5969
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset/done/ HTTP/1.1" 200 4574
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
