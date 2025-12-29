@@ -54801,3 +54801,5 @@ smtplib.SMTPSenderRefused: (530, b'5.7.0 Authentication Required. For more infor
 "POST /password_reset/ HTTP/1.1" 500 142260
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
