@@ -3,6 +3,8 @@
 import os
 from pathlib import Path
 import dj_database_url
+import certifi, ssl
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -155,13 +157,13 @@ SESSION_SAVE_EVERY_REQUEST = True
 # Email Configuration (for password reset)  Development
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
 # For production:
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+# Force Django to use certifi's CA bundle
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_ECHO_TO_STDOUT = True
+
 
 # REST Framework Configuration
 REST_FRAMEWORK = {
