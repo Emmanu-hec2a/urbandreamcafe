@@ -158,7 +158,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
 # For production:
 # Force Django to use certifi's CA bundle
-EMAIL_BACKEND = "sendgrid_django.SendgridBackend"
+EMAIL_BACKEND = "sgbackend.SendGridBackend"
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
