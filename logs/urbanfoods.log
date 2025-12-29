@@ -54700,3 +54700,22 @@ Watching for file changes with StatReloader
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /password_reset/done/ HTTP/1.1" 200 4576
+"GET /static/images/bg-pattern.jpg HTTP/1.1" 200 65386
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /password_reset/ HTTP/1.1" 200 5969
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset/done/ HTTP/1.1" 200 4576
+"GET /password_reset/ HTTP/1.1" 200 5969
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset/done/ HTTP/1.1" 200 4597
+Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
