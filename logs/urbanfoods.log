@@ -56281,3 +56281,4 @@ Not Found: /.well-known/appspecific/com.chrome.devtools.json
 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 10740
 "GET /api/cart/ HTTP/1.1" 200 97
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
