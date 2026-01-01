@@ -23,6 +23,11 @@ urlpatterns = [
     # Order placement
     path('api/order/place/', views.place_order, name='place_order'),
 
+    # MPESA integration
+    path('api/mpesa/initiate/', views.initiate_mpesa_payment, name='initiate_mpesa_payment'),
+    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
+    path('api/mpesa/stk-query/', views.mpesa_stk_query, name='mpesa_stk_query'),
+
     # Order tracking
     path('orders/', views.my_orders, name='my_orders'),
     path('orders/<str:order_number>/', views.order_detail, name='order_detail'),

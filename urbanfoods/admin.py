@@ -43,21 +43,25 @@ class FoodItemAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'user', 'status', 'total', 'created_at', 'estimated_delivery')
-    list_filter = ('status', 'created_at', 'estimated_delivery')
-    search_fields = ('order_number', 'user__username', 'user__email')
-    readonly_fields = ('order_number', 'created_at', 'updated_at')
+    list_display = ('order_number', 'user', 'store_type', 'status', 'total', 'payment_method', 'payment_status', 'payment_type', 'mpesa_receipt_number', 'payment_completed_at', 'created_at')
+    list_filter = ('status', 'store_type', 'payment_status', 'payment_type', 'created_at', 'estimated_delivery')
+    search_fields = ('order_number', 'user__username', 'user__email', 'mpesa_receipt_number')
+    readonly_fields = ('order_number', 'created_at', 'updated_at', 'payment_completed_at', 'mpesa_checkout_request_id', 'mpesa_transaction_date')
     ordering = ('-created_at',)
 
     fieldsets = (
         ('Order Information', {
-            'fields': ('order_number', 'user', 'status', 'created_at', 'updated_at')
+            'fields': ('order_number', 'user', 'store_type', 'status', 'created_at', 'updated_at')
         }),
         ('Delivery Details', {
             'fields': ('hostel', 'room_number', 'phone_number', 'delivery_notes', 'estimated_delivery')
         }),
         ('Pricing', {
             'fields': ('subtotal', 'delivery_fee', 'total', 'rating', 'review')
+        }),
+        ('Payment Information', {
+            'fields': ('payment_method', 'payment_status', 'payment_type', 'payment_completed_at', 'payment_failure_reason', 'mpesa_checkout_request_id', 'mpesa_receipt_number', 'mpesa_transaction_date'),
+            'classes': ('collapse',)
         }),
     )
 

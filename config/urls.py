@@ -6,6 +6,7 @@ from django.views.generic import RedirectView
 from django.templatetags.static import static as static_url
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.views.static import serve
 
 # Customize Django Admin site branding
 admin.site.site_header = "UrbanDream Backend"
@@ -16,6 +17,7 @@ urlpatterns = [
     # ==================== ADMIN PANELS ====================
     # Django's built-in admin (for database management)
     path('backend/', admin.site.urls),
+    path('offline/', views.offline, name='offline'),
     
     # Custom admin panel (for operations)
     path('admin-panel/login/', admin_views.admin_login, name='admin_login'),
@@ -112,6 +114,16 @@ urlpatterns = [
 
     # Favicon
     path('favicon.ico', RedirectView.as_view(url=static_url('images/favicon.png'), permanent=True)),
+
+    #Service Worker & Manifest serving
+    path('service-worker.js', serve, {
+        'path': 'service-worker.js',
+        'document_root': settings.BASE_DIR,  # adjust if files are elsewhere
+    }),
+    path('manifest.json', serve, {
+        'path': 'manifest.json',
+        'document_root': settings.BASE_DIR,
+    }),
 
 ]
 

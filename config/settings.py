@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 import dj_database_url
-import certifi, ssl
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -143,16 +143,17 @@ if not DEBUG:
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Static files storage - use basic storage in production to avoid manifest errors
+# Static files storage with WhiteNoise
 if DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 else:
-    # In production, use basic storage to avoid issues with missing static files
+    
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Session Configuration
 SESSION_COOKIE_AGE = 604800  # 1 week
 SESSION_SAVE_EVERY_REQUEST = True
+PASSWORD_RESET_TIMEOUT = 1800  # 30 minutes
 
 # Email Configuration (for password reset)  Development
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
@@ -228,3 +229,14 @@ LOGGING = {
 }
 
 LOGIN_URL = 'login'
+
+# MPESA Configuration
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE', '174379')  # Default sandbox shortcode
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY')
+MPESA_PAYBILL_NUMBER = os.environ.get('MPESA_PAYBILL_NUMBER', '174379')
+MPESA_TILL_NUMBER = os.environ.get('MPESA_TILL_NUMBER', '174379')
+ACCOUNT_NUMBER = os.environ.get('ACCOUNT_NUMBER', 'URBANFOODS')
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://urbandreamcafe.up.railway.app/mpesa/callback/')
+MPESA_PRODUCTION = os.environ.get('MPESA_PRODUCTION', 'False') == 'True'

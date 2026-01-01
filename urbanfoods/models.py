@@ -146,6 +146,34 @@ class Order(models.Model):
     estimated_delivery = models.DateTimeField(null=True, blank=True)
     delivered_at = models.DateTimeField(null=True, blank=True)
     
+    # Payment information
+    payment_method = models.CharField(max_length=10, choices=[('mpesa', 'MPESA')], default='mpesa')
+    payment_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled')
+    ], default='pending')
+    payment_type = models.CharField(max_length=20, choices=[
+        ('till', 'Till Number'),
+        ('paybill', 'Paybill Number')
+    ], blank=True, null=True)
+    payment_completed_at = models.DateTimeField(null=True, blank=True)
+    payment_failure_reason = models.TextField(blank=True, null=True)
+
+    # Store type for the order
+    store_type = models.CharField(max_length=10, choices=[
+        ('food', 'Food Store'),
+        ('liquor', 'Liquor Store'),
+        ('grocery', 'Grocery Shop')
+    ], default='food')
+
+    # MPESA specific fields
+    mpesa_checkout_request_id = models.CharField(max_length=50, blank=True, null=True)
+    mpesa_receipt_number = models.CharField(max_length=20, blank=True, null=True)
+    mpesa_transaction_date = models.CharField(max_length=20, blank=True, null=True)
+
     # Additional fields
     cancellation_reason = models.TextField(blank=True)
     rating = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MinValueValidator(5)])

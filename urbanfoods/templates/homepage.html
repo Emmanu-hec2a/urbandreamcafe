@@ -8,7 +8,7 @@
     <title>UrbanDreamsCafe</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="manifest" href="{% static 'urbanfoods/manifest.json' %}">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ff6600">
 
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
@@ -22,6 +22,13 @@
     <meta name="msapplication-TileColor" content="#ea580c">
     <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
     <meta name="application-name" content="Urban Dreams Cafe">
+
+    <!--Description-->
+    <meta name="description" content="Urban Dreams Cafe - Your go-to online food, liquor, and grocery delivery service in Nairobi. Enjoy delicious meals, refreshing drinks, and everyday essentials delivered to your doorstep. Order now for a seamless shopping experience!">
+    <meta name="keywords" content="Urban Foods, Urban Dreams Cafe, Online Food Delivery Nyeri/Karatina, Liquor Delivery Nairobi, Grocery Delivery Nyeri/Karatina, Order Food Online, Nyeri/Karatina Food Delivery, Fresh Groceries Nairobi, Drink Delivery Nyeri/Karatina, Fast Food Delivery, Urban Foods Nairobi">
+
+    <!--robot-->
+    <meta name="robots" content="index, follow">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -186,6 +193,13 @@
             background-color: #2d2d2d !important;
             color: #e5e5e5 !important;
         }
+        [data-bs-theme="dark"] .install-banner-pop{
+            color: #e5e7eb;
+        }
+
+        /* [data-bs-theme="dark"] .switch-store-btn{
+            text-decoration: none;
+        } */
 
         /* Mobile food card styling */
         @media (max-width: 767px) {
@@ -427,7 +441,7 @@
                 <div class="flex items-center gap-2">
                     <!-- Store Dropdown -->
                     <div class="relative">
-                        <button onclick="toggleStoreDropdown()" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-orange-600 rounded-lg hover:bg-gray-100">
+                        <button onclick="toggleStoreDropdown()" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-orange-600 rounded-lg hover:bg-gray-100 switch-store-btn">
                             <i class="fas fa-store"></i>
                             <span class="hidden sm:inline">Store</span>
                             <i id="storeDropdownIcon" class="fas fa-chevron-down text-xs"></i>
@@ -730,20 +744,35 @@
                     <label class="block text-sm font-medium mb-1">Room/House Number*</label>
                     <input type="text" id="roomNumber" required placeholder="e.g., Room 205" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                 </div>
+
+                <!-- Phone -->
                 <div>
                     <label class="block text-sm font-medium mb-1">Phone Number*</label>
-                    <input type="tel" id="phoneNumber" required placeholder="07XXXXXXXX" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <input type="tel" id="phoneNumber" required placeholder="07XXXXXXXX or 011XXXXXXX"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <p class="text-xs text-gray-500 mt-1">Use your M‑PESA registered number</p>
                 </div>
+
                 <div>
                     <label class="block text-sm font-medium mb-1">Delivery Notes (Optional)</label>
-                    <textarea id="deliveryNotes" rows="3" placeholder="Any special instructions..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                    <textarea id="deliveryNotes" rows="2" placeholder="Any special instructions..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
                 </div>
+
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <div class="flex justify-between mb-2">
                         <span>Total Amount:</span>
                         <span id="checkoutTotal" class="font-bold text-xl text-orange-600">KES 0</span>
                     </div>
-                    <p class="text-sm text-gray-600">💰 Cash On Delivery</p>
+                    <div class="mb-3">
+                        <!--label class="block text-sm font-medium mb-2">Payment Method</label-->
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="paymentMethod" value="mpesa" checked class="mr-2">
+                                <span class="font-semibold text-green-600">M-PESA</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p id="paymentNote" class="text-sm text-gray-600">📱 MPESA Payment</p>
                     <p class="text-sm text-gray-600">⏱️ Estimated delivery: 15 mins (varies with location)</p>
                 </div>
                 <div class="flex gap-3">
@@ -751,10 +780,75 @@
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold">
-                        Confirm Order
+                        Pay with MPESA
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="paymentProcessingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 fade-in">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-mobile-alt text-orange-600 text-5xl animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Processing Payment</h2>
+                <p class="text-gray-600 mb-4">Please check your phone and enter your MPESA PIN to complete the payment.</p>
+                <div class="bg-orange-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-700">STK Push sent to <span id="processingPhoneNumber" class="font-semibold"></span></p>
+                    <p class="text-sm text-gray-700">Amount: <span id="processingAmount" class="font-semibold"></span></p>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+                    <span class="text-sm text-gray-600">Waiting for payment confirmation...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="paymentSuccessModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 fade-in">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-green-600 text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2 text-green-600">Payment Successful!</h2>
+                <p class="text-gray-600 mb-4">Your order has been placed and payment received.</p>
+                <div class="bg-green-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-700">Order #<span id="successOrderNumber" class="font-semibold"></span></p>
+                    <p class="text-sm text-gray-700">Estimated Delivery: <span id="successDeliveryTime" class="font-semibold"></span></p>
+                </div>
+                <button onclick="closeSuccessModal()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700">
+                    View My Orders
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Failed Modal -->
+    <div id="paymentFailedModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 fade-in">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-times-circle text-red-600 text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2 text-red-600">Payment Failed</h2>
+                <p class="text-gray-600 mb-4">Your MPESA payment could not be processed.</p>
+                <div class="bg-red-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-700" id="failureReason">Please try again or contact support if the issue persists.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="closeFailedModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Close
+                    </button>
+                    <button onclick="retryPayment()" class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold">
+                        Try Again
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -792,7 +886,7 @@
                 <img src="{% static 'images/favicon.png' %}" alt="UDC" class="w-10 h-10 rounded-lg">
             </div>
             <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 text-sm">Install Urban Dreams Cafe</h3>
+                <h3 class="font-semibold text-gray-900 text-sm install-banner-pop">Install Urban Dreams Cafe</h3>
                 <p class="text-gray-600 text-xs mt-1">Order faster with the app!</p>
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-star text-yellow-400 text-xs"></i>
@@ -827,10 +921,31 @@
             </div>
         </div>
     </div>
+
+    <div
+        id="ios-install-banner"
+        class="hidden fixed bottom-0 inset-x-0 bg-gray-900 text-white p-4 text-center text-sm z-50"
+        >
+        Install <b>UrbanFoods</b>:  
+        Tap <b>Share</b> → <b>Add to Home Screen</b>
+    </div>
     {% endif %}
 
 
     <script>
+        // Set Django template variables as JavaScript constants
+        const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        const storeType = '{{ store_type|escapejs }}';
+        {% if user.is_authenticated %}
+        const userData = {
+            defaultHostel: '{{ user.default_hostel|escapejs }}',
+            defaultRoom: '{{ user.default_room|escapejs }}',
+            phoneNumber: '{{ user.phone_number|escapejs }}'
+        };
+        {% else %}
+        const userData = null;
+        {% endif %}
+
         // Function to generate star rating HTML
         function generateStarRating(rating, reviewCount) {
             if (!rating || rating === 0) {
@@ -1024,9 +1139,9 @@
             document.getElementById('checkoutTotal').textContent = `KES ${cartData.total + 20}`; // Assuming flat delivery fee of 20
 
             // Pre-fill form with user profile data
-            {% if user.is_authenticated %}
-            prefillCheckoutForm();
-            {% endif %}
+            if (isAuthenticated) {
+                prefillCheckoutForm();
+            }
         }
 
         // Pre-fill checkout form with user profile data
@@ -1074,6 +1189,14 @@
             }
         });
 
+        // Payment method is fixed to MPESA
+        document.addEventListener('DOMContentLoaded', () => {
+            const paymentNote = document.getElementById('paymentNote');
+            if (paymentNote) {
+                paymentNote.innerHTML = '📱 MPESA Payment';
+            }
+        });
+
         // Close checkout
         function closeCheckout() {
             document.getElementById('checkoutModal').classList.add('hidden');
@@ -1093,7 +1216,8 @@
                 hostel: hostelValue,
                 room_number: document.getElementById('roomNumber').value,
                 phone_number: document.getElementById('phoneNumber').value,
-                delivery_notes: document.getElementById('deliveryNotes').value
+                delivery_notes: document.getElementById('deliveryNotes').value,
+                payment_method: document.querySelector('input[name="paymentMethod"]:checked').value
             };
             
             try {
@@ -1358,29 +1482,29 @@
             }
 
             // Check if cart has items of different store type
-            {% if user.is_authenticated %}
-            try {
-                const cartResponse = await fetch('/api/cart/');
-                const cartData = await cartResponse.json();
-                
-                if (cartData.success && cartData.items.length > 0) {
-                    // Check if any cart item is from different store type
-                    const hasDifferentStoreType = cartData.items.some(item => {
-                        // We'll check this on the backend, but show warning here
-                        return true; // Assume we need to clear cart
-                    });
-                    
-                    if (hasDifferentStoreType) {
-                        const confirmClear = confirm('Switching stores will clear your current cart. Continue?');
-                        if (!confirmClear) {
-                            return;
+            if (isAuthenticated) {
+                try {
+                    const cartResponse = await fetch('/api/cart/');
+                    const cartData = await cartResponse.json();
+
+                    if (cartData.success && cartData.items.length > 0) {
+                        // Check if any cart item is from different store type
+                        const hasDifferentStoreType = cartData.items.some(item => {
+                            // We'll check this on the backend, but show warning here
+                            return true; // Assume we need to clear cart
+                        });
+
+                        if (hasDifferentStoreType) {
+                            const confirmClear = confirm('Switching stores will clear your current cart. Continue?');
+                            if (!confirmClear) {
+                                return;
+                            }
                         }
                     }
+                } catch (error) {
+                    console.error('Error checking cart:', error);
                 }
-            } catch (error) {
-                console.error('Error checking cart:', error);
             }
-            {% endif %}
 
             try {
                 const response = await fetch('/api/store/switch/', {
@@ -1518,10 +1642,205 @@
             {% endif %}
         });
 
+        // iOS install banner
+        function isIOS() {
+            return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+        }
+
+        function isInStandaloneMode() {
+            return window.navigator.standalone === true;
+        }
+
+        // Show iOS install banner
+        if (isIOS() && !isInStandaloneMode()) {
+            document.getElementById('ios-install-banner').style.display = 'block';
+        }
+
+        // Close payment success modal
+        function closeSuccessModal() {
+            document.getElementById('paymentSuccessModal').classList.add('hidden');
+            window.location.href = '/orders/';
+        }
+
+        // Retry payment
+        function retryPayment() {
+            document.getElementById('paymentFailedModal').classList.add('hidden');
+            // Re-submit the checkout form
+            document.getElementById('checkoutForm').dispatchEvent(new Event('submit'));
+        }
+
+        // Close payment failed modal
+        function closeFailedModal() {
+            document.getElementById('paymentFailedModal').classList.add('hidden');
+        }
+
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("{% static 'urbanfoods/service-worker.js' %}")
-            .then(reg => console.log("Service Worker registered!", reg))
-            .catch(err => console.error("Service Worker registration failed:", err));
+        window.addEventListener('load', () => {
+            navigator.serviceWorker
+            .register('/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+
+                // Check for updates every hour
+                setInterval(() => {
+                registration.update();
+                }, 60 * 60 * 1000); // 1 hour
+
+                // Handle updates
+                registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New service worker available
+                    showUpdateNotification(registration);
+                    }
+                });
+                });
+            })
+            .catch((error) => {
+                console.error('❌ Service Worker registration failed:', error);
+            });
+
+            // Listen for controller change (new SW activated)
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+            console.log('🔄 New Service Worker activated, reloading page');
+            window.location.reload();
+            });
+        });
+
+        // Check if we're online/offline
+        window.addEventListener('online', () => {
+            console.log('🌐 Back online!');
+            hideOfflineBanner();
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📡 You are offline');
+            showOfflineBanner();
+        });
+        }
+
+        // Show update notification
+        function showUpdateNotification(registration) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.id = 'sw-update-notification';
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #417690;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            max-width: 90%;
+        `;
+        
+        notification.innerHTML = `
+            <span>🎉 New version available!</span>
+            <button id="sw-update-btn" style="
+            background: white;
+            color: ##ff6600;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            ">Update Now</button>
+            <button id="sw-dismiss-btn" style="
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            ">Later</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Handle update button
+        document.getElementById('sw-update-btn').addEventListener('click', () => {
+            if (registration.waiting) {
+            // Tell the waiting service worker to activate
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            notification.remove();
+        });
+
+        // Handle dismiss button
+        document.getElementById('sw-dismiss-btn').addEventListener('click', () => {
+            notification.remove();
+        });
+        }
+
+        // Show offline banner
+        function showOfflineBanner() {
+        // Check if banner already exists
+        if (document.getElementById('offline-banner')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'offline-banner';
+        banner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 20px;
+            text-align: center;
+            z-index: 9999;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid #f5c6cb;
+        `;
+        banner.innerHTML = '📡 You are offline. Some features may be limited.';
+        document.body.prepend(banner);
+        }
+
+        // Hide offline banner
+        function hideOfflineBanner() {
+        const banner = document.getElementById('offline-banner');
+        if (banner) {
+            banner.style.background = '#d4edda';
+            banner.style.color = '#155724';
+            banner.style.borderBottom = '2px solid #c3e6cb';
+            banner.innerHTML = '🌐 Back online!';
+            
+            setTimeout(() => {
+            banner.remove();
+            }, 3000);
+        }
+        }
+
+        // Preload critical pages when user is idle
+        if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            // Cache important pages in the background
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+                type: 'CACHE_URLS',
+                urls: [
+                '/',
+                '/login/',
+                '/signup/',
+                '/offline/'
+                ]
+            });
+            }
+        });
         }
     </script>
 </body>
