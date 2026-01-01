@@ -282,8 +282,8 @@
             background: rgba(45, 45, 45, 0.9);
         }
         .store-spinner {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #ea580c;
             border-radius: 50%;
@@ -424,26 +424,25 @@
             <!-- Cart items will be loaded here -->
         </div>
     </div>
+    
 
     <!-- Age Verification Modal -->
     <div id="ageVerificationModal" class="modal fade d-none" tabindex="-1" style="z-index: 1060;">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center p-4">
-                    <div class="mb-4">
-                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
-                    </div>
-                    <h2 class="modal-title mb-3">Age Verification Required</h2>
-                    <p class="text-muted mb-4">You must be 18 years or older to access the Liquor Store.</p>
-                    <div class="d-flex flex-column gap-2">
-                        <button onclick="verifyAge(true)" class="btn btn-primary w-100">
-                            I am 18 or older
-                        </button>
-                        <button onclick="verifyAge(false)" class="btn btn-outline-secondary w-100">
-                            I am under 18
-                        </button>
-                    </div>
-                </div>
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-center">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-5xl"></i>
+            </div>
+            <h2 class="text-xl font-bold mb-3">Age Verification Required</h2>
+            <p class="text-gray-600 mb-4">You must be 18 years or older to access the Liquor Store.</p>
+            <div class="flex flex-col gap-2">
+                <button onclick="verifyAge(true)" 
+                        class="w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 transition">
+                    I am 18 or older
+                </button>
+                <button onclick="verifyAge(false)" 
+                        class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition">
+                    I am under 18
+                </button>
             </div>
         </div>
     </div>
@@ -454,9 +453,24 @@
     <script>
         function toggleCart() {
             const sidebar = document.getElementById('cartSidebar');
-            sidebar.classList.toggle('d-none');
-            if (!sidebar.classList.contains('d-none')) {
+            const isHidden = sidebar.classList.contains('d-none');
+
+            if (isHidden) {
+                // Make it visible
+                sidebar.classList.remove('d-none');
+                // Force reflow so transition applies
+                void sidebar.offsetWidth;
+                // Slide in
+                sidebar.style.transform = 'translateX(0)';
+                // Load cart content
                 loadCart();
+            } else {
+                // Slide out
+                sidebar.style.transform = 'translateX(100%)';
+                // After transition, hide completely
+                setTimeout(() => {
+                    sidebar.classList.add('d-none');
+                }, 300); // match your transition duration
             }
         }
 
@@ -543,6 +557,22 @@
             }
             return cookieValue;
         }
+
+        document.addEventListener('click', function (event) {
+            const nav = document.getElementById('navbarNav');
+            const toggler = document.querySelector('.navbar-toggler');
+
+            // Check if nav is currently shown
+            const isOpen = nav.classList.contains('show');
+
+            if (isOpen) {
+                // If click is outside nav AND not on the toggler
+                if (!nav.contains(event.target) && !toggler.contains(event.target)) {
+                const bsCollapse = bootstrap.Collapse.getInstance(nav);
+                bsCollapse.hide();
+                }
+            }
+        });
 
         function showAlert(message, type) {
             // Simple alert implementation
@@ -633,7 +663,7 @@
             if (storeType === 'liquor' && !isAgeVerified()) {
                 const modal = document.getElementById('ageVerificationModal');
                 if (modal) {
-                    modal.classList.remove('d-none');
+                    modal.classList.remove('hidden');
                     return;
                 }
             }
@@ -662,7 +692,7 @@
                     // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = "/";
-                    }, 1000);
+                    }, 3000);
                 } else {
                     hideStoreLoader();
                     showAlert(data.message || 'Error switching store.', 'danger');
@@ -681,12 +711,12 @@
             if (isOfAge) {
                 // Store age verification in localStorage
                 localStorage.setItem('age_verified', 'true');
-                if (modal) modal.classList.add('d-none');
+                if (modal) modal.classList.add('hidden');
                 // Switch to liquor store
                 switchStore('liquor');
             } else {
                 // User is underage
-                if (modal) modal.classList.add('d-none');
+                if (modal) modal.classList.add('hidden');
                 showAlert('You must be 18 or older to access the Liquor Store.', 'warning');
             }
         }
@@ -695,17 +725,7 @@
         {% if store_type == 'liquor' %}
         document.addEventListener('DOMContentLoaded', () => {
             if (!isAgeVerified()) {
-                const modal = document.getElementById('ageVerificationModal');
-                if (modal) {
-                    // Use Bootstrap modal show method
-                    const bsModal = new bootstrap.Modal(modal);
-                    bsModal.show();
-                }
-            }
-
-            if (sessionStorage.getItem('store_switching') === 'true') {
-                showStoreLoader();
-                sessionStorage.removeItem('store_switching');
+                document.getElementById('ageVerificationModal').classList.remove('hidden');
             }
         });
         {% endif %}
