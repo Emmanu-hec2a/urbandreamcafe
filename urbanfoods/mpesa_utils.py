@@ -16,7 +16,7 @@ class MpesaIntegration:
         self.consumer_key = os.environ.get('MPESA_CONSUMER_KEY', 'n1gp98HCA8gmOwt3vn4dhKG80Gwjdf1MXfoKbnESEiPmarUp')
         self.consumer_secret = os.environ.get('MPESA_CONSUMER_SECRET', 'C1W7E7P24lGGFZgokkGQ9qPudbGWxzLuCLphkK7wF72kctwoAIAPJL7Qmzc9SGuQ')
         self.shortcode = os.environ.get('MPESA_SHORTCODE', '174379')  # Default sandbox shortcode
-        self.passkey = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd')
+        self.passkey = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
         self.paybill_number = os.environ.get('MPESA_PAYBILL_NUMBER', '6960814')  # Paybill number for liquor store
         self.account_number = os.environ.get('ACCOUNT_NUMBER', 'URBANFOODS')  # Account number for paybill
 
