@@ -39,6 +39,12 @@ class MpesaIntegration:
                 self.access_token_url,
                 auth=(self.consumer_key, self.consumer_secret)
             )
+
+            print("====== MPESA STK PUSH ======")
+            print("STATUS:", response.status_code)
+            print("RESPONSE:", response.text)
+            
+            print("============================")
             response.raise_for_status()
 
             data = response.json()
@@ -102,6 +108,12 @@ class MpesaIntegration:
             }
 
             response = requests.post(self.stk_push_url, json=payload, headers=headers)
+
+            print("====== MPESA STK PUSH ======")
+            print("STATUS:", response.status_code)
+            print("RESPONSE:", response.text)
+            print("PAYLOAD:", payload)
+            print("============================")
             response.raise_for_status()
 
             result = response.json()
@@ -144,6 +156,12 @@ class MpesaIntegration:
             }
 
             response = requests.post(self.stk_query_url, json=payload, headers=headers)
+
+            print("====== MPESA STK PUSH ======")
+            print("STATUS:", response.status_code)
+            print("RESPONSE:", response.text)
+            print("PAYLOAD:", payload)
+            print("============================")
             response.raise_for_status()
 
             result = response.json()

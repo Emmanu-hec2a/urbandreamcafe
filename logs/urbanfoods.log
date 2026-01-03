@@ -56628,3 +56628,5 @@ C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
+"GET /service-worker.js HTTP/1.1" 200 6365
+"GET /service-worker.js HTTP/1.1" 304 0
