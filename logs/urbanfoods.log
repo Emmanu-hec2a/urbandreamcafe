@@ -56543,3 +56543,88 @@ Not Found: /.well-known/appspecific/com.chrome.devtools.json
 "GET /api/cart/ HTTP/1.1" 200 97
 C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
 Watching for file changes with StatReloader
+"GET /service-worker.js HTTP/1.1" 500 59
+"GET /service-worker.js HTTP/1.1" 500 59
+"GET /service-worker.js HTTP/1.1" 500 59
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 138287
+"GET /api/cart/ HTTP/1.1" 200 97
+"GET /signup/ HTTP/1.1" 200 31344
+"GET /login/ HTTP/1.1" 200 13388
+"GET /offline/ HTTP/1.1" 200 3098
+"GET /manifest.json HTTP/1.1" 200 530
+"GET / HTTP/1.1" 200 138287
+"GET /service-worker.js HTTP/1.1" 200 6365
+"GET /service-worker.js HTTP/1.1" 304 0
+Not Found: /mpesa/callback/
+"GET /mpesa/callback/ HTTP/1.1" 404 10641
+"GET /favicon.ico HTTP/1.1" 301 0
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /service-worker.js HTTP/1.1" 304 0
+C:\Users\PC\Desktop\UrbanFoods\config\urls.py changed, reloading.
+Watching for file changes with StatReloader
+Method Not Allowed (GET): /mpesa/callback/
+"GET /mpesa/callback/ HTTP/1.1" 405 0
+"GET /service-worker.js HTTP/1.1" 304 0
+C:\Users\PC\Desktop\UrbanFoods\config\urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /login/ HTTP/1.1" 200 13388
+"GET /offline/ HTTP/1.1" 200 3098
+"GET /signup/ HTTP/1.1" 200 31344
+"GET / HTTP/1.1" 200 138287
+"GET /service-worker.js HTTP/1.1" 304 0
+"GET / HTTP/1.1" 200 138287
+"GET /media/food_images/chipskuku_ffz8Rhc.jpeg HTTP/1.1" 200 11177
+"GET /static/styles.css HTTP/1.1" 200 8080
+"GET /media/food_images/chBeans_UygQcMz.jpeg HTTP/1.1" 200 9535
+"GET /media/food_images/chipo_sypaKSA.jpg HTTP/1.1" 200 36594
+"GET /media/food_images/chicken_APd4w6i.jpeg HTTP/1.1" 200 14164
+"GET /media/food_images/boilo_a0x4rAo.jpeg HTTP/1.1" 200 7895
+"GET /media/food_images/chapo_pjX6yyu.jpeg HTTP/1.1" 200 8419
+"GET /media/food_images/chMasala_5pcmlgI.jpeg HTTP/1.1" 200 10387
+"GET /media/food_images/pilau_MNlmfR1.jpeg HTTP/1.1" 200 11279
+"GET /media/food_images/chBeef_C61MTe9.jpeg HTTP/1.1" 200 13441
+"GET /media/food_images/chMatumbo_Wkgjo3p.jpeg HTTP/1.1" 200 8558
+"GET /media/food_images/rcBeans_Y7WXf9W.jpeg HTTP/1.1" 200 8588
+"GET /media/food_images/ugAnGreens_SJT0a7P.jpeg HTTP/1.1" 200 12098
+"GET /media/food_images/ugbeef_j98VPJf.jpeg HTTP/1.1" 200 7565
+"GET /media/food_images/ugManagu_RUiWoKQ.jpeg HTTP/1.1" 200 9270
+"GET /media/food_images/ugmala_DPRfFFt.jpeg HTTP/1.1" 200 4939
+"GET /media/food_images/ugMatumbo_2sJlFBi.jpeg HTTP/1.1" 200 15335
+"GET /media/food_images/ugMayai_DafUhV2.jpeg HTTP/1.1" 200 15794
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"GET /api/cart/ HTTP/1.1" 200 97
+"GET /static/images/favicon.png HTTP/1.1" 200 44335
+"POST /api/cart/add/ HTTP/1.1" 200 96
+"POST /api/cart/add/ HTTP/1.1" 200 96
+"GET /api/cart/ HTTP/1.1" 200 258
+"POST /api/order/place/ HTTP/1.1" 200 220
+"POST /api/order/place/ HTTP/1.1" 200 220
+"GET /profile/ HTTP/1.1" 200 42209
+"GET /service-worker.js HTTP/1.1" 304 0
+"GET / HTTP/1.1" 200 138287
+"GET /api/cart/ HTTP/1.1" 200 258
+"GET /login/ HTTP/1.1" 200 13388
+"GET /signup/ HTTP/1.1" 200 31344
+"GET /offline/ HTTP/1.1" 200 3098
+"GET / HTTP/1.1" 200 138287
+"GET /service-worker.js HTTP/1.1" 304 0
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 11172
+"GET / HTTP/1.1" 200 138287
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 11172
+"GET /api/cart/ HTTP/1.1" 200 258
+"GET /api/cart/ HTTP/1.1" 200 258
+"POST /api/order/place/ HTTP/1.1" 200 220
+"POST /api/order/place/ HTTP/1.1" 200 220
+"GET / HTTP/1.1" 200 138287
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 11172
+"GET /api/cart/ HTTP/1.1" 200 258
+"GET /api/cart/ HTTP/1.1" 200 258
+"POST /api/order/place/ HTTP/1.1" 200 220
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\PC\Desktop\UrbanFoods\config\settings.py changed, reloading.
+Watching for file changes with StatReloader

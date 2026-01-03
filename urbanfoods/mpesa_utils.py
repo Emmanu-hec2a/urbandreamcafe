@@ -13,11 +13,11 @@ class MpesaIntegration:
 
     def __init__(self):
         # MPESA API credentials from environment variables
-        self.consumer_key = os.environ.get('MPESA_CONSUMER_KEY')
-        self.consumer_secret = os.environ.get('MPESA_CONSUMER_SECRET')
+        self.consumer_key = os.environ.get('MPESA_CONSUMER_KEY', 'n1gp98HCA8gmOwt3vn4dhKG80Gwjdf1MXfoKbnESEiPmarUp')
+        self.consumer_secret = os.environ.get('MPESA_CONSUMER_SECRET', 'C1W7E7P24lGGFZgokkGQ9qPudbGWxzLuCLphkK7wF72kctwoAIAPJL7Qmzc9SGuQ')
         self.shortcode = os.environ.get('MPESA_SHORTCODE', '174379')  # Default sandbox shortcode
-        self.passkey = os.environ.get('MPESA_PASSKEY')
-        self.paybill_number = os.environ.get('MPESA_PAYBILL_NUMBER', '174379')  # Paybill number for liquor store
+        self.passkey = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd')
+        self.paybill_number = os.environ.get('MPESA_PAYBILL_NUMBER', '6960814')  # Paybill number for liquor store
         self.account_number = os.environ.get('ACCOUNT_NUMBER', 'URBANFOODS')  # Account number for paybill
 
         # API endpoints
@@ -59,16 +59,6 @@ class MpesaIntegration:
         return password
 
     def initiate_stk_push(self, phone_number, amount, account_reference, transaction_desc, store_type='food'):
-        """
-        Initiate STK Push for payment
-
-        Args:
-            phone_number: Customer's phone number (format: 254XXXXXXXXX)
-            amount: Amount to charge
-            account_reference: Order number or reference
-            transaction_desc: Transaction description
-            store_type: 'food', 'grocery', or 'liquor' to determine payment type
-        """
         try:
             access_token = self.get_access_token()
             if not access_token:
@@ -77,26 +67,31 @@ class MpesaIntegration:
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             password = self.generate_password(timestamp)
 
-            # Determine payment type based on store
-            if store_type == 'liquor':
-                # Use Paybill for liquor store - AccountReference is the account number customer enters
-                party_b = self.paybill_number  # Paybill number
-                account_reference = self.account_number  # Account number for Paybill
+            is_production = os.environ.get('MPESA_PRODUCTION') == 'true'
+
+            if not is_production:
+                # SANDBOX: PayBill ONLY
+                transaction_type = "CustomerPayBillOnline"
+                party_b = self.shortcode
+                account_reference = account_reference
             else:
-                # Use Till Number for food and grocery stores - AccountReference is order reference
-                party_b = os.environ.get('MPESA_TILL_NUMBER', '174379')
-                account_reference = f"FOOD-{account_reference}"
+                # PRODUCTION (you can refine later)
+                transaction_type = "CustomerPayBillOnline"
+                party_b = self.shortcode
 
             payload = {
                 "BusinessShortCode": self.shortcode,
                 "Password": password,
                 "Timestamp": timestamp,
-                "TransactionType": "CustomerPayBillOnline" if store_type == 'liquor' else "CustomerBuyGoodsOnline",
-                "Amount": int(amount),
+                "TransactionType": transaction_type,
+                "Amount": max(1, int(amount)),
                 "PartyA": phone_number,
                 "PartyB": party_b,
                 "PhoneNumber": phone_number,
-                "CallBackURL": os.environ.get('MPESA_CALLBACK_URL', 'https://yourdomain.com/mpesa/callback/'),
+                "CallBackURL": os.environ.get(
+                    'MPESA_CALLBACK_URL',
+                    'https://urbandreamcafe.up.railway.app/mpesa/callback/'
+                ),
                 "AccountReference": account_reference,
                 "TransactionDesc": transaction_desc
             }
@@ -115,21 +110,16 @@ class MpesaIntegration:
                 return {
                     'success': True,
                     'checkout_request_id': result.get('CheckoutRequestID'),
-                    'response_code': result.get('ResponseCode'),
-                    'response_description': result.get('ResponseDescription'),
                     'customer_message': result.get('CustomerMessage')
                 }
-            else:
-                return {
-                    'success': False,
-                    'message': result.get('ResponseDescription', 'STK Push failed'),
-                    'response_code': result.get('ResponseCode')
-                }
+
+            return {
+                'success': False,
+                'message': result.get('ResponseDescription', 'STK Push failed')
+            }
 
         except requests.exceptions.RequestException as e:
-            return {'success': False, 'message': f'Network error: {str(e)}'}
-        except Exception as e:
-            return {'success': False, 'message': f'Error: {str(e)}'}
+            return {'success': False, 'message': f'Network error: {e.response.text if e.response else str(e)}'}
 
     def query_stk_status(self, checkout_request_id):
         """Query STK push payment status"""
