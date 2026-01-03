@@ -73,7 +73,7 @@ class MpesaIntegration:
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             password = self.generate_password(timestamp)
 
-            is_production = os.environ.get('MPESA_PRODUCTION') == 'true'
+            is_production = os.environ.get('MPESA_PRODUCTION', 'false').lower() == 'true'
 
             if not is_production:
                 # SANDBOX: PayBill ONLY
