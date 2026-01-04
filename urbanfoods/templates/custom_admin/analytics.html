@@ -141,7 +141,7 @@
 
 
 <!-- Peak Hours -->
-<div class="admin-card">
+<div class="admin-card mb-4">
     <div class="card-header">
         <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Peak Order Hours</h5>
     </div>
@@ -151,11 +151,112 @@
         </div>
     </div>
 </div>
+
+<!-- Payments Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="fas fa-credit-card me-2"></i>Payments Analytics</h4>
+    </div>
+</div>
+
+<!-- Payment Metrics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">M-PESA Revenue</h6>
+                    <h4 class="mb-0 text-success">KES {{ mpesa_revenue|floatformat:2 }}</h4>
+                </div>
+                <i class="fas fa-mobile-alt fa-2x text-success opacity-75"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">Success Rate</h6>
+                    <h4 class="mb-0 text-primary">{{ mpesa_success_rate|floatformat:1 }}%</h4>
+                </div>
+                <i class="fas fa-check-circle fa-2x text-primary opacity-75"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">Avg Transaction</h6>
+                    <h4 class="mb-0 text-info">KES {{ mpesa_avg_transaction|floatformat:2 }}</h4>
+                </div>
+                <i class="fas fa-calculator fa-2x text-info opacity-75"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-1">Failed Payments</h6>
+                    <h4 class="mb-0 text-danger" id="failedPaymentsCount">0</h4>
+                </div>
+                <i class="fas fa-times-circle fa-2x text-danger opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Charts Row -->
+<div class="row mb-4">
+    <!-- Payment Timeline Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>M-PESA Payment Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="paymentTimelineChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Failed Payment Reasons -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Failed Payment Reasons</h5>
+            </div>
+            <div class="card-body">
+                <div id="failedPaymentsList">
+                    <!-- Failed payments will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Peak Payment Hours -->
+<div class="admin-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Peak Payment Hours</h5>
+    </div>
+    <div class="card-body">
+        <div class="chart-container">
+            <canvas id="peakPaymentHoursChart" height="200"></canvas>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-let revenueChart, statusChart, peakHoursChart, liquorRevenueChart;
+let revenueChart, statusChart, peakHoursChart, liquorRevenueChart, paymentTimelineChart, peakPaymentHoursChart;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeCharts();
@@ -168,6 +269,9 @@ function initializeCharts() {
     const peakHoursData = JSON.parse('{{ peak_hours|escapejs }}');
     const topItemsData = JSON.parse('{{ top_items|escapejs }}');
     const topCustomersData = JSON.parse('{{ top_customers|escapejs }}');
+    const mpesaPaymentTimeline = JSON.parse('{{ mpesa_payment_timeline|escapejs }}');
+    const failedPayments = JSON.parse('{{ failed_payments|escapejs }}');
+    const peakPaymentHours = JSON.parse('{{ peak_payment_hours|escapejs }}');
 
 
     // Revenue Chart
@@ -352,6 +456,119 @@ function initializeCharts() {
             <div class="text-center py-4">
                 <i class="fas fa-users fa-2x text-muted mb-2"></i>
                 <p class="text-muted mb-0">No customer data available</p>
+            </div>
+        `;
+    }
+
+    // Payment Timeline Chart
+    const paymentTimelineCtx = document.getElementById('paymentTimelineChart').getContext('2d');
+
+    paymentTimelineChart = new Chart(paymentTimelineCtx, {
+        type: 'line',
+        data: {
+            labels: mpesaPaymentTimeline.map(item => {
+                const date = new Date(item.day);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [{
+                label: 'M-PESA Revenue (KES)',
+                data: mpesaPaymentTimeline.map(item => item.revenue),
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Successful Payments',
+                data: mpesaPaymentTimeline.map(item => item.successful_payments),
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Peak Payment Hours Chart
+    const peakPaymentHoursCtx = document.getElementById('peakPaymentHoursChart').getContext('2d');
+
+    peakPaymentHoursChart = new Chart(peakPaymentHoursCtx, {
+        type: 'bar',
+        data: {
+            labels: peakPaymentHours.map(item => `${item.hour}:00`),
+            datasets: [{
+                label: 'Payments',
+                data: peakPaymentHours.map(item => item.payment_count),
+                backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Set failed payments count
+    const failedPaymentsCount = document.getElementById('failedPaymentsCount');
+    failedPaymentsCount.textContent = failedPayments.reduce((sum, item) => sum + item.count, 0);
+
+    // Populate Failed Payments List
+    const failedPaymentsList = document.getElementById('failedPaymentsList');
+    if (failedPayments.length > 0) {
+        failedPayments.forEach(reason => {
+            const reasonDiv = document.createElement('div');
+            reasonDiv.className = 'd-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded';
+            reasonDiv.innerHTML = `
+                <div>
+                    <h6 class="mb-1">${reason.payment_failure_reason || 'Unknown'}</h6>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-danger">${reason.count} failed</span>
+                </div>
+            `;
+            failedPaymentsList.appendChild(reasonDiv);
+        });
+    } else {
+        failedPaymentsList.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <p class="text-muted mb-0">No failed payments</p>
             </div>
         `;
     }

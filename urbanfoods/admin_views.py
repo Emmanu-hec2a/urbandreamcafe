@@ -197,11 +197,19 @@ def admin_dashboard_stats(request):
 def admin_orders(request):
     """Order management page"""
     status_filter = request.GET.get('status', 'all')
+    payment_method_filter = request.GET.get('payment_method', 'all')
+    payment_status_filter = request.GET.get('payment_status', 'all')
 
     orders = Order.objects.all().select_related('user').prefetch_related('items')
 
     if status_filter != 'all':
         orders = orders.filter(status=status_filter)
+
+    if payment_method_filter != 'all':
+        orders = orders.filter(payment_method=payment_method_filter)
+
+    if payment_status_filter != 'all':
+        orders = orders.filter(payment_status=payment_status_filter)
 
     # Recent orders first
     orders = orders.order_by('-created_at')
@@ -209,6 +217,8 @@ def admin_orders(request):
     context = {
         'orders': orders[:50],  # Limit to recent 50
         'status_filter': status_filter,
+        'payment_method_filter': payment_method_filter,
+        'payment_status_filter': payment_status_filter,
     }
 
     return render(request, 'custom_admin/orders.html', context)
@@ -332,6 +342,27 @@ def cancel_order(request):
         })
 
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+@staff_member_required(login_url='admin_login')
+def get_payment_details(request, order_number):
+    """Get payment details for an order"""
+    order = get_object_or_404(Order, order_number=order_number)
+
+    if order.payment_method != 'mpesa':
+        return JsonResponse({'success': False, 'message': 'Payment details only available for M-PESA payments'})
+
+    payment_details = {
+        'mpesa_receipt_number': order.mpesa_receipt_number,
+        'transaction_date': order.created_at.isoformat() if order.created_at else None,
+        'phone_number': order.phone_number,
+        'checkout_request_id': order.checkout_request_id,
+        'payment_completed_at': order.payment_completed_at.isoformat() if order.payment_completed_at else None,
+    }
+
+    return JsonResponse({
+        'success': True,
+        'payment_details': payment_details
+    })
 
 # ==================== LIQUOR ADMIN VIEWS ====================
 
@@ -920,22 +951,49 @@ def admin_analytics(request):
     # Peak hours
     peak_hours = (Order.objects.filter(created_at__gte=start_date).annotate(hour=ExtractHour('created_at')).values('hour').annotate(order_count=Count('id')).order_by('-order_count')[:10])
 
+    # M-PESA Payment Analytics
+    mpesa_orders = Order.objects.filter(
+        created_at__gte=start_date,
+        payment_method='mpesa'
+    )
+
+    # M-PESA revenue and success rate
+    mpesa_revenue = mpesa_orders.filter(payment_status='completed').aggregate(total=Sum('total'))['total'] or 0
+    mpesa_success_rate = (mpesa_orders.filter(payment_status='completed').count() / mpesa_orders.count() * 100) if mpesa_orders.count() > 0 else 0
+    mpesa_avg_transaction = mpesa_revenue / mpesa_orders.filter(payment_status='completed').count() if mpesa_orders.filter(payment_status='completed').count() > 0 else 0
+
+    # M-PESA payment timeline
+    mpesa_payment_timeline = mpesa_orders.filter(payment_status='completed').annotate(day=TruncDate('payment_completed_at')).values('day').annotate(
+        successful_payments=Count('id'),
+        revenue=Sum('total')
+    ).order_by('day')
+
+    # Failed payment reasons
+    failed_payments = mpesa_orders.filter(payment_status='failed').values('payment_failure_reason').annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+
+    # Peak payment hours
+    peak_payment_hours = mpesa_orders.filter(payment_status='completed').annotate(hour=ExtractHour('payment_completed_at')).values('hour').annotate(
+        payment_count=Count('id')
+    ).order_by('-payment_count')[:10]
+
     # Liquor-specific metrics
     liquor_orders = Order.objects.filter(
         created_at__gte=start_date,
         items__food_item__store_type='liquor'
     ).distinct()
-    
+
     liquor_revenue = OrderItem.objects.filter(
         order__created_at__gte=start_date,
         food_item__store_type='liquor'
     ).aggregate(total=Sum('price_at_order'))['total'] or 0
-    
+
     liquor_items_sold = OrderItem.objects.filter(
         order__created_at__gte=start_date,
         food_item__store_type='liquor'
     ).aggregate(total=Sum('quantity'))['total'] or 0
-    
+
     # Top selling liquor items
     top_liquor_items = OrderItem.objects.filter(
         order__created_at__gte=start_date,
@@ -948,7 +1006,7 @@ def admin_analytics(request):
         total_quantity=Sum('quantity'),
         total_revenue=Sum('price_at_order')
     ).order_by('-total_quantity')[:10]
-    
+
     # Liquor revenue trend
     liquor_daily_revenue = (
     OrderItem.objects.filter(
@@ -974,6 +1032,13 @@ def admin_analytics(request):
         'total_orders': total_orders,
         'avg_order_value': avg_order_value,
         'peak_hours': json.dumps(list(peak_hours), default=str),
+        # M-PESA Payment metrics
+        'mpesa_revenue': mpesa_revenue,
+        'mpesa_success_rate': mpesa_success_rate,
+        'mpesa_avg_transaction': mpesa_avg_transaction,
+        'mpesa_payment_timeline': json.dumps(list(mpesa_payment_timeline), default=str),
+        'failed_payments': json.dumps(list(failed_payments), default=str),
+        'peak_payment_hours': json.dumps(list(peak_payment_hours), default=str),
         # Liquor metrics
         'liquor_revenue': liquor_revenue,
         'liquor_orders_count': liquor_orders.count(),

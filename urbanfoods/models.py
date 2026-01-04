@@ -118,7 +118,8 @@ class CartItem(models.Model):
 class Order(models.Model):
     """Customer orders"""
     STATUS_CHOICES = [
-        ('pending', ' Pending'),
+        ('payment_pending', 'Payment Pending'),
+        ('pending', 'Pending'),
         ('preparing', ' Preparing'),
         ('out_for_delivery', ' Out for Delivery'),
         ('delivered', ' Delivered'),
@@ -176,7 +177,7 @@ class Order(models.Model):
 
     # Additional fields
     cancellation_reason = models.TextField(blank=True)
-    rating = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MinValueValidator(5)])
+    rating = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)])
     review = models.TextField(blank=True)
     
     class Meta:
