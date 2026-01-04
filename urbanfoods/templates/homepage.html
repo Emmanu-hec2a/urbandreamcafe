@@ -1252,8 +1252,6 @@
 
             const hostelSelect = document.getElementById('hostelSelect');
             const customHostelInput = document.getElementById('customHostel');
-
-            // Use custom hostel name if "other" is selected
             const hostelValue = hostelSelect.value === 'other' ? customHostelInput.value : hostelSelect.value;
 
             const formData = {
@@ -1261,39 +1259,35 @@
                 room_number: document.getElementById('roomNumber').value,
                 phone_number: document.getElementById('phoneNumber').value,
                 delivery_notes: document.getElementById('deliveryNotes').value,
-                payment_method: document.querySelector('input[name="paymentMethod"]:checked').value
+                payment_method: 'mpesa'
             };
 
-            // Close checkout modal and show payment processing modal
             closeCheckout();
             showPaymentProcessingModal(formData.phone_number, cartData.total + 20);
 
             try {
-                // Initiate MPESA payment
-                const response = await fetch('/api/mpesa/initiate/', {
+                const response = await fetch('/api/order/place/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify({
-                        phone_number: formData.phone_number,
-                        amount: cartData.total + 20, // Including delivery fee
-                        order_data: formData
-                    })
+                    body: JSON.stringify(formData)
                 });
 
                 const data = await response.json();
+                console.log('Order response:', data);
 
                 if (data.success) {
-                    // Start polling for payment status
-                    pollPaymentStatus(data.checkout_request_id, formData);
+                    pollPaymentStatus(data.checkout_request_id, data.order_number);
                 } else {
-                    showPaymentFailedModal(data.message || 'Failed to initiate payment');
+                    document.getElementById('paymentProcessingModal').classList.add('hidden');
+                    showPaymentFailedModal(data.message);
                 }
             } catch (error) {
-                console.error('Error initiating payment:', error);
-                showPaymentFailedModal('Error initiating payment. Please try again.');
+                console.error('Error:', error);
+                document.getElementById('paymentProcessingModal').classList.add('hidden');
+                showPaymentFailedModal('Network error. Please try again.');
             }
         });
 
@@ -1318,9 +1312,9 @@
         }
 
         // Poll for payment status
-        async function pollPaymentStatus(checkoutRequestId, orderData) {
+        async function pollPaymentStatus(checkoutRequestId, orderNumber) {
             let attempts = 0;
-            const maxAttempts = 60; // 2 minutes (60 * 2 seconds)
+            const maxAttempts = 40;
 
             const pollInterval = setInterval(async () => {
                 attempts++;
@@ -1338,62 +1332,34 @@
                     });
 
                     const data = await response.json();
+                    console.log(`Poll ${attempts}:`, data);
 
-                    if (data.success && data.result_code === '0') {
-                        // Payment successful
-                        clearInterval(pollInterval);
-                        document.getElementById('paymentProcessingModal').classList.add('hidden');
-
-                        // Place the order now that payment is confirmed
-                        await placeOrderAfterPayment(orderData, data.transaction_id);
-                    } else if (data.result_code && data.result_code !== '0') {
-                        // Payment failed
-                        clearInterval(pollInterval);
-                        document.getElementById('paymentProcessingModal').classList.add('hidden');
-                        showPaymentFailedModal(data.result_desc || 'Payment was cancelled or failed');
+                    if (data.success && data.result_code !== undefined && data.result_code !== null) {
+                        const resultCode = String(data.result_code);
+                        
+                        if (resultCode === '0') {
+                            clearInterval(pollInterval);
+                            document.getElementById('paymentProcessingModal').classList.add('hidden');
+                            if (typeof toggleCart === 'function') toggleCart();
+                            showPaymentSuccessModal(orderNumber, '30 minutes');
+                            document.getElementById('checkoutForm').reset();
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            clearInterval(pollInterval);
+                            document.getElementById('paymentProcessingModal').classList.add('hidden');
+                            showPaymentFailedModal(data.result_desc || 'Payment failed');
+                        }
                     }
                 } catch (error) {
-                    console.error('Error checking payment status:', error);
+                    console.error('Error:', error);
                 }
 
-                // Stop polling after max attempts
                 if (attempts >= maxAttempts) {
                     clearInterval(pollInterval);
                     document.getElementById('paymentProcessingModal').classList.add('hidden');
-                    showPaymentFailedModal('Payment timeout. Please check your MPESA messages and try again.');
+                    showPaymentFailedModal('Payment timeout. Check your orders.');
                 }
-            }, 2000); // Check every 2 seconds
-        }
-
-        // Place order after successful payment
-        async function placeOrderAfterPayment(orderData, transactionId) {
-            try {
-                const response = await fetch('/api/order/place/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({
-                        ...orderData,
-                        transaction_id: transactionId,
-                        payment_confirmed: true
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    toggleCart(); // Close cart
-                    showPaymentSuccessModal(data.order_number, data.estimated_delivery);
-                    document.getElementById('checkoutForm').reset();
-                } else {
-                    showPaymentFailedModal('Order placement failed. Please contact support.');
-                }
-            } catch (error) {
-                console.error('Error placing order:', error);
-                showPaymentFailedModal('Error placing order. Please contact support.');
-            }
+            }, 3000);
         }
 
         // Filter by category

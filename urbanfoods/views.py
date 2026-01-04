@@ -310,7 +310,7 @@ def place_order(request):
     total = subtotal + delivery_fee
 
     # Generate order number
-    order_number = f"UF{timezone.now().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
+    order_number = f"UDC{timezone.now().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
 
     # Handle MPESA payment
     if payment_method == 'mpesa':
