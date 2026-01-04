@@ -121,9 +121,9 @@ class Order(models.Model):
         ('payment_pending', 'Payment Pending'),
         ('pending', 'Pending'),
         ('preparing', ' Preparing'),
-        ('out_for_delivery', ' Out for Delivery'),
-        ('delivered', ' Delivered'),
-        ('cancelled', ' Cancelled'),
+        ('out_for_delivery', 'Out for Delivery'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
     ]
     
     order_number = models.CharField(max_length=20, unique=True, editable=False)

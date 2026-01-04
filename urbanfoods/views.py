@@ -306,7 +306,7 @@ def place_order(request):
     # Calculate totals
     subtotal = cart.total
     store_type = cart.items.first().food_item.store_type if cart.items.exists() else 'food'
-    delivery_fee = 20 if store_type == 'food' else 0
+    delivery_fee = 0 if store_type == 'food' else 20
     total = subtotal + delivery_fee
 
     # Generate order number
@@ -795,4 +795,21 @@ def mpesa_stk_query(request):
             pass
 
     return JsonResponse(result)
+
+# views.py
+@login_required
+def check_order_payment_status(request, order_number):
+    """Check order payment status"""
+    try:
+        order = Order.objects.get(order_number=order_number, user=request.user)
+        
+        return JsonResponse({
+            'success': True,
+            'payment_status': order.payment_status,
+            'order_status': order.status,
+            'mpesa_receipt_number': order.mpesa_receipt_number
+        })
+    except Order.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Order not found'}, status=404)
+
 

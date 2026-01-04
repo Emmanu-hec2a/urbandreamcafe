@@ -77,6 +77,7 @@ urlpatterns = [
     path('api/mpesa/initiate/', views.initiate_mpesa_payment, name='initiate_mpesa_payment'),
     path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
     path('api/mpesa/stk-query/', views.mpesa_stk_query, name='mpesa_stk_query'),
+    path('api/order/payment-status/<str:order_number>/', views.check_order_payment_status, name='check_order_payment_status'),
 
     # Liquor admin
     path('admin-panel/liquor/', admin_views.admin_liquor, name='admin_liquor'),

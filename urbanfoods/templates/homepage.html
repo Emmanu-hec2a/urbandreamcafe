@@ -1088,7 +1088,7 @@
                 `).join('');
                 
                 document.getElementById('cartSubtotal').textContent = `KES ${cartData.subtotal}`;
-                document.getElementById('cartTotal').textContent = `KES ${cartData.total + 20}`; // Assuming flat delivery fee of 20
+                document.getElementById('cartTotal').textContent = `KES ${cartData.total}`; // Assuming flat delivery fee of 20
             }
         }
 
@@ -1180,7 +1180,7 @@
             if (cartData.items.length === 0) return;
 
             document.getElementById('checkoutModal').classList.remove('hidden');
-            document.getElementById('checkoutTotal').textContent = `KES ${cartData.total + 20}`; // Assuming flat delivery fee of 20
+            document.getElementById('checkoutTotal').textContent = `KES ${cartData.total}`; // Assuming flat delivery fee of 20
 
             // Pre-fill form with user profile data
             if (isAuthenticated) {
@@ -1263,7 +1263,7 @@
             };
 
             closeCheckout();
-            showPaymentProcessingModal(formData.phone_number, cartData.total + 20);
+            showPaymentProcessingModal(formData.phone_number, cartData.total);
 
             try {
                 const response = await fetch('/api/order/place/', {
@@ -1320,44 +1320,69 @@
                 attempts++;
 
                 try {
-                    const response = await fetch('/api/mpesa/stk-query/', {
-                        method: 'POST',
+                    // First check order status (most reliable)
+                    const orderResponse = await fetch(`/api/order/payment-status/${orderNumber}/`, {
+                        method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRFToken': getCookie('csrftoken')
-                        },
-                        body: JSON.stringify({
-                            checkout_request_id: checkoutRequestId
-                        })
+                        }
                     });
 
-                    const data = await response.json();
-                    console.log(`Poll ${attempts}:`, data);
+                    const orderData = await orderResponse.json();
+                    console.log(`Poll ${attempts} - Order status:`, orderData);
 
-                    if (data.success && data.result_code !== undefined && data.result_code !== null) {
-                        const resultCode = String(data.result_code);
-                        
-                        if (resultCode === '0') {
+                    if (orderData.success) {
+                        if (orderData.payment_status === 'completed') {
+                            // Success confirmed by callback
                             clearInterval(pollInterval);
                             document.getElementById('paymentProcessingModal').classList.add('hidden');
                             if (typeof toggleCart === 'function') toggleCart();
                             showPaymentSuccessModal(orderNumber, '30 minutes');
                             document.getElementById('checkoutForm').reset();
                             setTimeout(() => location.reload(), 2000);
-                        } else {
+                            return; // Exit
+                        } else if (orderData.payment_status === 'failed' || orderData.order_status === 'cancelled') {
+                            // Failed confirmed by callback
                             clearInterval(pollInterval);
                             document.getElementById('paymentProcessingModal').classList.add('hidden');
-                            showPaymentFailedModal(data.result_desc || 'Payment failed');
+                            showPaymentFailedModal('Payment was cancelled or failed');
+                            return; // Exit
                         }
                     }
+
+                    // If order is still pending, also check STK query for early failure detection
+                    if (attempts % 3 === 0) { // Check STK query every 3rd attempt (every 9 seconds)
+                        const stkResponse = await fetch('/api/mpesa/stk-query/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify({
+                                checkout_request_id: checkoutRequestId
+                            })
+                        });
+
+                        const stkData = await stkResponse.json();
+                        console.log(`Poll ${attempts} - STK query:`, stkData);
+
+                        // Only handle definite failures from STK query
+                        if (stkData.success && stkData.result_code && String(stkData.result_code) !== '0') {
+                            clearInterval(pollInterval);
+                            document.getElementById('paymentProcessingModal').classList.add('hidden');
+                            showPaymentFailedModal(stkData.result_desc || 'Payment was cancelled');
+                            return;
+                        }
+                    }
+
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error checking status:', error);
                 }
 
                 if (attempts >= maxAttempts) {
                     clearInterval(pollInterval);
                     document.getElementById('paymentProcessingModal').classList.add('hidden');
-                    showPaymentFailedModal('Payment timeout. Check your orders.');
+                    showPaymentFailedModal('Payment confirmation timeout. Please check your orders page.');
                 }
             }, 3000);
         }
