@@ -1263,7 +1263,110 @@
                 delivery_notes: document.getElementById('deliveryNotes').value,
                 payment_method: document.querySelector('input[name="paymentMethod"]:checked').value
             };
-            
+
+            // Close checkout modal and show payment processing modal
+            closeCheckout();
+            showPaymentProcessingModal(formData.phone_number, cartData.total + 20);
+
+            try {
+                // Initiate MPESA payment
+                const response = await fetch('/api/mpesa/initiate/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        phone_number: formData.phone_number,
+                        amount: cartData.total + 20, // Including delivery fee
+                        order_data: formData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Start polling for payment status
+                    pollPaymentStatus(data.checkout_request_id, formData);
+                } else {
+                    showPaymentFailedModal(data.message || 'Failed to initiate payment');
+                }
+            } catch (error) {
+                console.error('Error initiating payment:', error);
+                showPaymentFailedModal('Error initiating payment. Please try again.');
+            }
+        });
+
+        // Show payment processing modal
+        function showPaymentProcessingModal(phoneNumber, amount) {
+            document.getElementById('processingPhoneNumber').textContent = phoneNumber;
+            document.getElementById('processingAmount').textContent = `KES ${amount}`;
+            document.getElementById('paymentProcessingModal').classList.remove('hidden');
+        }
+
+        // Show payment success modal
+        function showPaymentSuccessModal(orderNumber, deliveryTime) {
+            document.getElementById('successOrderNumber').textContent = orderNumber;
+            document.getElementById('successDeliveryTime').textContent = deliveryTime;
+            document.getElementById('paymentSuccessModal').classList.remove('hidden');
+        }
+
+        // Show payment failed modal
+        function showPaymentFailedModal(reason) {
+            document.getElementById('failureReason').textContent = reason;
+            document.getElementById('paymentFailedModal').classList.remove('hidden');
+        }
+
+        // Poll for payment status
+        async function pollPaymentStatus(checkoutRequestId, orderData) {
+            let attempts = 0;
+            const maxAttempts = 60; // 2 minutes (60 * 2 seconds)
+
+            const pollInterval = setInterval(async () => {
+                attempts++;
+
+                try {
+                    const response = await fetch('/api/mpesa/stk-query/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            checkout_request_id: checkoutRequestId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.result_code === '0') {
+                        // Payment successful
+                        clearInterval(pollInterval);
+                        document.getElementById('paymentProcessingModal').classList.add('hidden');
+
+                        // Place the order now that payment is confirmed
+                        await placeOrderAfterPayment(orderData, data.transaction_id);
+                    } else if (data.result_code && data.result_code !== '0') {
+                        // Payment failed
+                        clearInterval(pollInterval);
+                        document.getElementById('paymentProcessingModal').classList.add('hidden');
+                        showPaymentFailedModal(data.result_desc || 'Payment was cancelled or failed');
+                    }
+                } catch (error) {
+                    console.error('Error checking payment status:', error);
+                }
+
+                // Stop polling after max attempts
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    document.getElementById('paymentProcessingModal').classList.add('hidden');
+                    showPaymentFailedModal('Payment timeout. Please check your MPESA messages and try again.');
+                }
+            }, 2000); // Check every 2 seconds
+        }
+
+        // Place order after successful payment
+        async function placeOrderAfterPayment(orderData, transactionId) {
             try {
                 const response = await fetch('/api/order/place/', {
                     method: 'POST',
@@ -1271,29 +1374,27 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        ...orderData,
+                        transaction_id: transactionId,
+                        payment_confirmed: true
+                    })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    closeCheckout();
-                    toggleCart();
-                    showToast(`Order placed! Order #${data.order_number}. Estimated delivery: ${data.estimated_delivery}`);
+                    toggleCart(); // Close cart
+                    showPaymentSuccessModal(data.order_number, data.estimated_delivery);
                     document.getElementById('checkoutForm').reset();
-                    
-                    // Redirect to order tracking after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/orders/';
-                    }, 2000);
                 } else {
-                    showToast(data.message || 'Error placing order', 'error');
+                    showPaymentFailedModal('Order placement failed. Please contact support.');
                 }
             } catch (error) {
                 console.error('Error placing order:', error);
-                showToast('Error placing order. Please try again.', 'error');
+                showPaymentFailedModal('Error placing order. Please contact support.');
             }
-        });
+        }
 
         // Filter by category
         function filterCategory(button, categoryId) {

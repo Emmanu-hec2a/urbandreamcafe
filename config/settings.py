@@ -9,7 +9,7 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'bf28af9ec8b26a419e4044c300648f914e5aede006560d3f708289fa32c40ecb')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # settings.py
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # default
@@ -231,12 +231,12 @@ LOGGING = {
 LOGIN_URL = 'login'
 
 # MPESA Configuration
-MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'n1gp98HCA8gmOwt3vn4dhKG80Gwjdf1MXfoKbnESEiPmarUp')
-MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'C1W7E7P24lGGFZgokkGQ9qPudbGWxzLuCLphkK7wF72kctwoAIAPJL7Qmzc9SGuQ')
-MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE', '174379')  # Default sandbox shortcode
-MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd')
-MPESA_PAYBILL_NUMBER = os.environ.get('MPESA_PAYBILL_NUMBER', '174379')
-MPESA_TILL_NUMBER = os.environ.get('MPESA_TILL_NUMBER', '6960814')
-ACCOUNT_NUMBER = os.environ.get('ACCOUNT_NUMBER', 'URBANFOODS')
-MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://urbandreamcafe.up.railway.app/mpesa/callback/')
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE')  # Default sandbox shortcode
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY')
+MPESA_PAYBILL_NUMBER = os.environ.get('MPESA_PAYBILL_NUMBER')
+MPESA_TILL_NUMBER = os.environ.get('MPESA_TILL_NUMBER')
+ACCOUNT_NUMBER = os.environ.get('ACCOUNT_NUMBER')
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL')
 MPESA_PRODUCTION = os.environ.get('MPESA_PRODUCTION', 'sandbox')  # 'True' for production, 'sandbox' for testing

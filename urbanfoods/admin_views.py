@@ -355,7 +355,7 @@ def get_payment_details(request, order_number):
         'mpesa_receipt_number': order.mpesa_receipt_number,
         'transaction_date': order.created_at.isoformat() if order.created_at else None,
         'phone_number': order.phone_number,
-        'checkout_request_id': order.checkout_request_id,
+        'checkout_request_id': order.mpesa_checkout_request_id,
         'payment_completed_at': order.payment_completed_at.isoformat() if order.payment_completed_at else None,
     }
 
