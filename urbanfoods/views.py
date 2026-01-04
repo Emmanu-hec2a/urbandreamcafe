@@ -7,6 +7,7 @@ from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt as crsf_exempt
 from .models import *
 import json
 import uuid
@@ -646,6 +647,7 @@ def initiate_mpesa_payment(request):
             'message': f'Payment initiation failed: {str(e)}'
         })
 
+@crsf_exempt
 @require_http_methods(["POST"])
 def mpesa_callback(request):
     """Handle M-PESA payment callback"""

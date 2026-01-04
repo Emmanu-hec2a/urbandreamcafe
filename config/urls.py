@@ -71,6 +71,7 @@ urlpatterns = [
     path('admin-panel/api/orders/new/', admin_views.get_new_orders, name='get_new_orders'),
     path('admin-panel/api/orders/update-status/', admin_views.update_order_status, name='update_order_status'),
     path('admin-panel/api/orders/cancel/', admin_views.cancel_order, name='cancel_order'),
+    path('admin-panel/api/orders/payment-details/<str:order_number>/', admin_views.get_payment_details, name='get_payment_details'),
 
     # =================== MPESA INTEGRATION ===================
     path('api/mpesa/initiate/', views.initiate_mpesa_payment, name='initiate_mpesa_payment'),
