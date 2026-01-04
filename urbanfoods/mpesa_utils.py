@@ -21,7 +21,8 @@ class MpesaIntegration:
         self.account_number = os.environ.get('ACCOUNT_NUMBER', 'URBANFOODS')  # Account number for paybill
 
         # API endpoints
-        self.base_url = 'https://sandbox.safaricom.co.ke' if not os.environ.get('MPESA_PRODUCTION', False) else 'https://api.safaricom.co.ke'
+        is_production = os.environ.get('MPESA_PRODUCTION', 'false').lower() == 'true'
+        self.base_url = 'https://api.safaricom.co.ke' if is_production else 'https://sandbox.safaricom.co.ke'
         self.access_token_url = f'{self.base_url}/oauth/v1/generate?grant_type=client_credentials'
         self.stk_push_url = f'{self.base_url}/mpesa/stkpush/v1/processrequest'
         self.stk_query_url = f'{self.base_url}/mpesa/stkpushquery/v1/query'
