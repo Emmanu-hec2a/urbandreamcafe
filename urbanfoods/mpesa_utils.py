@@ -17,8 +17,13 @@ class MpesaIntegration:
         self.consumer_secret = os.environ.get('MPESA_CONSUMER_SECRET')
         self.shortcode = os.environ.get('MPESA_SHORTCODE')  # Default sandbox shortcode
         self.passkey = os.environ.get('MPESA_PASSKEY')
+
+        #Paybill configuration for Liqour Store
         self.paybill_number = os.environ.get('MPESA_PAYBILL_NUMBER')  # Paybill number for liquor store
         self.account_number = os.environ.get('ACCOUNT_NUMBER')  # Account number for paybill
+
+        #Till configuration for Food Store & Grocery Store
+        self.till_number = os.environ.get('MPESA_TILL_NUMBER')  # Till number for food and grocery store
 
         # API endpoints
         is_production = os.environ.get('MPESA_PRODUCTION', 'false').lower() == 'true'
@@ -72,19 +77,22 @@ class MpesaIntegration:
                 return {'success': False, 'message': 'Failed to get access token'}
 
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-            password = self.generate_password(timestamp)
 
-            is_production = os.environ.get('MPESA_PRODUCTION', 'false').lower() == 'true'
-
-            if not is_production:
-                # SANDBOX: PayBill ONLY
+            #Check store type to determine whether to use Paybill or Till
+            if store_type == 'liquor':
+                party_b = self.paybill_number
                 transaction_type = "CustomerPayBillOnline"
-                party_b = self.shortcode
-                account_reference = account_reference
+                shortcode = self.paybill_number
+                passkey = self.passkey
+                account_ref = self.account_number
             else:
-                # PRODUCTION (you can refine later)
-                transaction_type = "CustomerPayBillOnline"
-                party_b = self.shortcode
+                party_b = self.till_number
+                transaction_type = "CustomerBuyGoodsOnline"
+                shortcode = self.till_number
+                passkey = self.passkey
+                account_ref = account_reference[:12]  # Limit to 12 characters for till
+
+            password = self.generate_password(shortcode, passkey, timestamp)
 
             payload = {
                 "BusinessShortCode": self.shortcode,
@@ -99,7 +107,7 @@ class MpesaIntegration:
                     'MPESA_CALLBACK_URL',
                     'https://urbandreamcafe.up.railway.app/mpesa/callback/'
                 ),
-                "AccountReference": account_reference,
+                "AccountReference": account_ref,
                 "TransactionDesc": transaction_desc
             }
 
@@ -112,8 +120,9 @@ class MpesaIntegration:
 
             print("====== MPESA STK PUSH ======")
             print("STATUS:", response.status_code)
-            print("RESPONSE:", response.text)
-            print("PAYLOAD:", payload)
+            print("Store Type:", store_type)
+            print("Transaction Type:", transaction_type)
+            print("Status:", response.status_code)
             print("============================")
             response.raise_for_status()
 
@@ -123,7 +132,8 @@ class MpesaIntegration:
                 return {
                     'success': True,
                     'checkout_request_id': result.get('CheckoutRequestID'),
-                    'customer_message': result.get('CustomerMessage')
+                    'customer_message': result.get('CustomerMessage'),
+                    'payment_type': 'paybill' if store_type == 'liquor' else 'till'
                 }
 
             return {
