@@ -144,11 +144,11 @@ class Order(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    estimated_delivery = models.DateTimeField(null=True, blank=True)
+    estimated_delivery = models.DateTimeField(null=True, blank=True, default=30)
     delivered_at = models.DateTimeField(null=True, blank=True)
     
     # Payment information
-    payment_method = models.CharField(max_length=10, choices=[('mpesa', 'MPESA')], default='mpesa')
+    payment_method = models.CharField(max_length=10, choices=[('mpesa', 'MPESA'), ('till', 'TILL')], default='till')
     payment_status = models.CharField(max_length=20, choices=[
         ('pending', 'Pending'),
         ('processing', 'Processing'),

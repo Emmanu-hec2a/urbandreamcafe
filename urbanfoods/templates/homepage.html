@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UrbanDreamsCafe</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>window.CURRENT_STORE_TYPE = "{{ request.session.store_type|default:'food' }}";</script>
 
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ff6600">
@@ -87,6 +88,10 @@
         [data-bs-theme="dark"] {
             background-color: #1a1a1a;
             color: #e5e5e5;
+        }
+        [data-bs-theme="dark"] .till-number-box {
+            background: #333 !important;
+            color:#1a1a1a;
         }
         [data-bs-theme="dark"] .bg-gray-50 {
             background-color: #1a1a1a !important;
@@ -811,29 +816,68 @@
                         <span>Total Amount:</span>
                         <span id="checkoutTotal" class="font-bold text-xl text-orange-600">KES 0</span>
                     </div>
-                    <div class="mb-3">
-                        <!--label class="block text-sm font-medium mb-2">Payment Method</label-->
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="radio" name="paymentMethod" value="mpesa" checked class="mr-2">
-                                <span class="font-semibold text-green-600">M-PESA</span>
-                            </label>
-                        </div>
-                    </div>
-                    <p id="paymentNote" class="text-sm text-gray-600">📱 MPESA Payment</p>
-                    <p class="text-sm text-gray-600">⏱️ Estimated delivery: 15 mins (varies with location)</p>
+
+                    <p class="text-sm text-gray-600">⏱Estimated delivery: 30 mins (varies with location)</p>
                 </div>
                 <div class="flex gap-3">
                     <button type="button" onclick="closeCheckout()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold">
-                        Pay with MPESA
+                        Pay via Till
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- Till Payment Modal -->
+    <div id="tillPaymentModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 fade-in">
+            <div class="text-center">
+                <i class="fas fa-store text-orange-600 text-5xl mb-3"></i>
+
+                <h2 class="text-2xl font-bold mb-2">Pay via M-PESA Till</h2>
+
+                <p class="text-gray-600 mb-4">
+                    Complete payment using the Till number below, then submit your order.
+                </p>
+
+                <div class="bg-orange-50 p-4 rounded-lg mb-4 till-number-box">
+                    <p class="text-sm text-gray-700 mb-1">Till Number</p>
+                    <p id="tillNumber"
+                    class="text-2xl font-bold text-orange-700 tracking-wide">
+                    </p>
+                </div>
+
+                <ol class="text-sm text-left text-gray-700 mb-4 list-decimal pl-5">
+                    <li>Go to <b>M-PESA</b></li>
+                    <li>Select <b>Lipa na M-PESA</b></li>
+                    <li>Select <b>Buy Goods</b></li>
+                    <li>Enter the Till Number above</li>
+                    <li>Enter the exact amount</li>
+                    <li>Confirm payment</li>
+                </ol>
+
+                <div class="flex gap-3">
+                    <button onclick="closeTillModal()"
+                            class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button onclick="confirmTillPayment()"
+                            class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
+                        I Have Paid
+                    </button>
+                </div>
+
+                <p class="text-xs text-gray-500 mt-3">
+                    ⚠️ Orders are confirmed after admin verifies payment.
+                </p>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Payment Processing Modal -->
     <div id="paymentProcessingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -885,7 +929,7 @@
                 </div>
                 <h2 class="text-2xl font-bold mb-2 text-green-600">Payment Successful!</h2>
                 <p class="text-gray-600 mb-4">Your order has been placed and payment received.</p>
-                <div class="bg-green-50 p-4 rounded-lg mb-4">
+                <div class="bg-green-50 p-4 rounded-lg mb-4 till-number-box">
                     <p class="text-sm text-gray-700">Order #<span id="successOrderNumber" class="font-semibold"></span></p>
                     <p class="text-sm text-gray-700">Estimated Delivery: <span id="successDeliveryTime" class="font-semibold"></span></p>
                 </div>
@@ -903,7 +947,7 @@
                 <div class="mb-4">
                     <i class="fas fa-times-circle text-red-600 text-5xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold mb-2 text-red-600">Payment Failed</h2>
+                <h2 class="text-2xl font-bold mb-2 text-red-600">Payment By Till Procedure</h2>
                 <p class="text-gray-600 mb-4">Your MPESA payment could not be processed.</p>
                 <div class="bg-red-50 p-4 rounded-lg mb-4">
                     <p class="text-sm text-gray-700" id="failureReason">Please try again or contact support if the issue persists.</p>
@@ -998,7 +1042,6 @@
         Tap <b>Share</b> → <b>Add to Home Screen</b>
     </div>
     {% endif %}
-
 
     <script>
         // Set Django template variables as JavaScript constants
@@ -1195,6 +1238,42 @@
             }
         }
 
+        // Store loading overlay functions
+        function showStoreLoading() {
+            const overlay = document.getElementById('storeLoadingOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('active');
+            }
+        }
+
+        function hideStoreLoading() {
+            const overlay = document.getElementById('storeLoadingOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function showAlert(message, type) {
+            // Simple alert implementation
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+
         // Proceed to checkout
         function proceedToCheckout() {
             if (cartData.items.length === 0) return;
@@ -1266,50 +1345,133 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
+        function getTillNumber() {
+            if (window.CURRENT_STORE_TYPE === 'liquor') {
+                return '--- ---'
+            }else {
+            return '6960814'}
+        }
+
+
+
         // Handle checkout form submission
-        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const hostelSelect = document.getElementById('hostelSelect');
-            const customHostelInput = document.getElementById('customHostel');
-            const hostelValue = hostelSelect.value === 'other' ? customHostelInput.value : hostelSelect.value;
-
-            const formData = {
-                hostel: hostelValue,
-                room_number: document.getElementById('roomNumber').value,
-                phone_number: document.getElementById('phoneNumber').value,
-                delivery_notes: document.getElementById('deliveryNotes').value,
-                payment_method: 'mpesa'
-            };
+            // Validate form first
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return;
+            }
 
             closeCheckout();
-            showPaymentProcessingModal(formData.phone_number, cartData.total);
+
+            // Set till number
+            document.getElementById('tillNumber').innerText = getTillNumber();
+
+            // Show till modal
+            document.getElementById('tillPaymentModal').classList.remove('hidden');
+        });
+
+        function closeTillModal() {
+            document.getElementById('tillPaymentModal').classList.add('hidden');
+        }
+
+        async function confirmTillPayment() {
+            const hostel = document.getElementById('hostelSelect').value;
+            const customHostel = document.getElementById('customHostel')?.value;
+            const roomNumber = document.getElementById('roomNumber').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const deliveryNotes = document.getElementById('deliveryNotes').value;
+
+            const finalHostel = hostel === 'other' ? customHostel : hostel;
+
+            if (!finalHostel || !roomNumber || !phoneNumber) {
+                showAlert('Please fill all required fields.', 'warning');
+                return;
+            }
 
             try {
+                showStoreLoading();
+
                 const response = await fetch('/api/order/place/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        hostel: finalHostel,
+                        room_number: roomNumber,
+                        phone_number: phoneNumber,
+                        delivery_notes: deliveryNotes,
+                        payment_method: 'cash'
+                    })
                 });
 
                 const data = await response.json();
-                console.log('Order response:', data);
+
+                hideStoreLoading();
 
                 if (data.success) {
-                    pollPaymentStatus(data.checkout_request_id, data.order_number);
+                    closeCheckout();
+                    document.getElementById('successOrderNumber').innerText = data.order_number;
+                    document.getElementById('successDeliveryTime').innerText = '15 mins';
+                    document.getElementById('paymentSuccessModal').classList.remove('hidden');
                 } else {
-                    document.getElementById('paymentProcessingModal').classList.add('hidden');
-                    showPaymentFailedModal(data.message);
+                    showAlert(data.message || 'Order could not be placed.', 'danger');
                 }
+
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('paymentProcessingModal').classList.add('hidden');
-                showPaymentFailedModal('Network error. Please try again.');
+                hideStoreLoading();
+                console.error(error);
+                showAlert('Network error. Please try again.', 'danger');
             }
-        });
+        }
+
+        // document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+        //     e.preventDefault();
+
+        //     const hostelSelect = document.getElementById('hostelSelect');
+        //     const customHostelInput = document.getElementById('customHostel');
+        //     const hostelValue = hostelSelect.value === 'other' ? customHostelInput.value : hostelSelect.value;
+
+        //     const formData = {
+        //         hostel: hostelValue,
+        //         room_number: document.getElementById('roomNumber').value,
+        //         phone_number: document.getElementById('phoneNumber').value,
+        //         delivery_notes: document.getElementById('deliveryNotes').value,
+        //         payment_method: 'mpesa'
+        //     };
+
+        //     closeCheckout();
+        //     showPaymentProcessingModal(formData.phone_number, cartData.total);
+
+        //     try {
+        //         const response = await fetch('/api/order/place/', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //                 'X-CSRFToken': getCookie('csrftoken')
+        //             },
+        //             body: JSON.stringify(formData)
+        //         });
+
+        //         const data = await response.json();
+        //         console.log('Order response:', data);
+
+        //         if (data.success) {
+        //             pollPaymentStatus(data.checkout_request_id, data.order_number);
+        //         } else {
+        //             document.getElementById('paymentProcessingModal').classList.add('hidden');
+        //             showPaymentFailedModal(data.message);
+        //         }
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         document.getElementById('paymentProcessingModal').classList.add('hidden');
+        //         showPaymentFailedModal('Network error. Please try again.');
+        //     }
+        // });
 
         // Show payment processing modal
         function showPaymentProcessingModal(phoneNumber, amount) {
@@ -1563,17 +1725,17 @@
         });
 
         // Load cart on page load if user is authenticated
-        {% if user.is_authenticated %}
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/cart/')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('cartBadge').textContent = data.cart_count || 0;
-                    }
-                });
+            if (isAuthenticated) {
+                fetch('/api/cart/')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('cartBadge').textContent = data.cart_count || 0;
+                        }
+                    });
+            }
         });
-        {% endif %}
 
         // Add event listeners for category buttons
         document.addEventListener('DOMContentLoaded', () => {
@@ -1628,25 +1790,6 @@
         });
 
         // ==================== STORE SWITCHING ====================
-
-        // Store loading overlay functions
-        function showStoreLoading() {
-            const overlay = document.getElementById('storeLoadingOverlay');
-            if (overlay) {
-                overlay.classList.remove('hidden');
-                overlay.classList.add('active');
-            }
-        }
-
-        function hideStoreLoading() {
-            const overlay = document.getElementById('storeLoadingOverlay');
-            if (overlay) {
-                overlay.classList.remove('active');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                }, 300);
-            }
-        }
 
         // Check if user is age verified (stored in localStorage)
         function isAgeVerified() {
@@ -1748,13 +1891,11 @@
         }
 
         // Check age verification on page load if on liquor store
-        {% if store_type == 'liquor' %}
         document.addEventListener('DOMContentLoaded', () => {
-            if (!isAgeVerified()) {
+            if (storeType === 'liquor' && !isAgeVerified()) {
                 document.getElementById('ageVerificationModal').classList.remove('hidden');
             }
         });
-        {% endif %}
 
         // ==================== PWA INSTALL PROMPT ====================
 
@@ -1766,12 +1907,12 @@
             deferredPrompt = e;
 
             // Show install popup if user is authenticated
-            {% if user.is_authenticated %}
-            const installPopup = document.getElementById('pwaInstallPopup');
-            if (installPopup) {
-                installPopup.classList.remove('hidden');
+            if (isAuthenticated) {
+                const installPopup = document.getElementById('pwaInstallPopup');
+                if (installPopup) {
+                    installPopup.classList.remove('hidden');
+                }
             }
-            {% endif %}
         });
 
         // Handle install button click
@@ -1822,15 +1963,15 @@
 
         // Check if we should show the popup (not dismissed recently)
         document.addEventListener('DOMContentLoaded', () => {
-            {% if user.is_authenticated %}
-            const dismissedTime = localStorage.getItem('pwa_dismissed');
-            if (dismissedTime) {
-                const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
-                if (hoursSinceDismissed < 24) {
-                    return; // Don't show if dismissed within 24 hours
+            if (isAuthenticated) {
+                const dismissedTime = localStorage.getItem('pwa_dismissed');
+                if (dismissedTime) {
+                    const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
+                    if (hoursSinceDismissed < 24) {
+                        return; // Don't show if dismissed within 24 hours
+                    }
                 }
             }
-            {% endif %}
         });
 
         // iOS install banner

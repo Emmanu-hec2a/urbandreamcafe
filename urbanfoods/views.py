@@ -300,7 +300,7 @@ def place_order(request):
     delivery_notes = data.get('delivery_notes', '')
     payment_method = data.get('payment_method', 'cash')
 
-    if payment_method not in ['mpesa', 'cash']:
+    if payment_method not in ['manual', 'cash']:
         return JsonResponse({'success': False, 'message': 'Invalid payment method'})
 
     # Calculate totals
@@ -312,83 +312,53 @@ def place_order(request):
     # Generate order number
     order_number = f"UDC{timezone.now().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
 
-    # Handle MPESA payment
-    if payment_method == 'mpesa':
-        from .mpesa_utils import mpesa
+    # Manual payment logic
+    if payment_method == 'manual':
+        order = Order.objects.create(
+            order_number=order_number,
+            user=request.user,
+            hostel=hostel,
+            room_number=room_number,
+            phone_number=phone_number,
+            delivery_notes=delivery_notes,
+            subtotal=subtotal,
+            delivery_fee=delivery_fee,
+            total=total,
+            payment_method=payment_method,
+            store_type=store_type,
+            payment_type='paybill' if store_type == 'liquor' else 'till',
+            payment_status='pending',
+            status='pending',  # Ready for processing once payment is confirmed by admin
+            estimated_delivery=timezone.now() + timezone.timedelta(minutes=30)
+        )
 
-        try:
-            # Format phone number for MPESA
-            formatted_phone = mpesa.format_phone_number(phone_number)
-
-            # Initiate STK push
-            stk_result = mpesa.initiate_stk_push(
-                phone_number=formatted_phone,
-                amount=int(total),
-                account_reference=order_number,
-                transaction_desc=f"Payment for Order {order_number}",
-                store_type=store_type
+        # Create order items
+        for cart_item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                food_item=cart_item.food_item,
+                quantity=cart_item.quantity,
+                price_at_order=cart_item.food_item.price
             )
 
-            if stk_result['success']:
-                # Create order with 'payment_pending' status
-                order = Order.objects.create(
-                    order_number=order_number,
-                    user=request.user,
-                    hostel=hostel,
-                    room_number=room_number,
-                    phone_number=phone_number,
-                    delivery_notes=delivery_notes,
-                    subtotal=subtotal,
-                    delivery_fee=delivery_fee,
-                    total=total,
-                    payment_method=payment_method,
-                    store_type=store_type,
-                    payment_type='paybill' if store_type == 'liquor' else 'till',
-                    payment_status='pending',  # Will be updated by callback
-                    status='payment_pending',  # New status to indicate awaiting payment
-                    mpesa_checkout_request_id=stk_result['checkout_request_id'],
-                    estimated_delivery=timezone.now() + timezone.timedelta(minutes=30)
-                )
+        # Create status history
+        OrderStatusHistory.objects.create(
+            order=order,
+            status='pending',
+            notes='Order placed - Awaiting manual payment confirmation'
+        )
 
-                # Create order items
-                for cart_item in cart.items.all():
-                    OrderItem.objects.create(
-                        order=order,
-                        food_item=cart_item.food_item,
-                        quantity=cart_item.quantity,
-                        price_at_order=cart_item.food_item.price
-                    )
+        # DON'T clear cart yet - will clear after payment confirmation
+        # DON'T update times_ordered yet - will update after payment confirmation
 
-                # Create status history
-                OrderStatusHistory.objects.create(
-                    order=order,
-                    status='payment_pending',
-                    notes=f'Order created. Awaiting MPESA payment confirmation. STK Push sent to {phone_number}'
-                )
-
-                # DON'T clear cart yet - will clear after payment confirmation
-                # DON'T update times_ordered yet - will update after payment confirmation
-
-                return JsonResponse({
-                    'success': True,
-                    'message': stk_result['customer_message'],
-                    'order_number': order.order_number,
-                    'payment_method': 'mpesa',
-                    'checkout_request_id': stk_result['checkout_request_id'],
-                    'estimated_delivery': order.estimated_delivery.strftime('%I:%M %p'),
-                    'awaiting_payment': True
-                })
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'message': f'Payment initiation failed: {stk_result["message"]}. Please try cash on delivery or try again.'
-                })
-
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'Payment system error: {str(e)}. Please try cash on delivery.'
-            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Order placed successfully! Please complete payment using the TILL number provided.',
+            'order_number': order.order_number,
+            'payment_method': 'manual',
+            'estimated_delivery': order.estimated_delivery.strftime('%I:%M %p'),
+            'awaiting_payment': True
+        })
 
     # Cash on delivery logic stays the same...
     else:
@@ -808,8 +778,10 @@ def check_order_payment_status(request, order_number):
             'payment_status': order.payment_status,
             'order_status': order.status,
             'mpesa_receipt_number': order.mpesa_receipt_number
+#         })
         })
     except Order.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Order not found'}, status=404)
+#             'mpesa_receipt_number': order.mpesa_receipt_number
 
 
