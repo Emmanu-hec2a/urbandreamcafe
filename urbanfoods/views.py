@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt as crsf_exempt
 from .models import *
 import json
 import uuid
+from urbanfoods.notifications import send_admin_order_notification, send_customer_order_confirmation
 
 # ==================== HOMEPAGE & FOOD CATALOG ====================
 
@@ -399,6 +400,9 @@ def place_order(request):
 
         request.user.loyalty_points += int(total)
         request.user.save()
+
+        send_customer_order_confirmation(order)
+        send_admin_order_notification(order)
 
         return JsonResponse({
             'success': True,
