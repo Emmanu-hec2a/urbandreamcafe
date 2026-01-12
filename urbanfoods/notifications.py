@@ -247,14 +247,16 @@ Your order has been received and is being processed.
 Order Details:
 --------------
 Order Number: {order.order_number}
-Order Date: {order.created_at.strftime('%B %d, %Y at %I:%M %p')}
+Order Date: {order.created_at.timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}
+
+Payment Method: {order.payment_method.upper()}
 
 Delivery Information:
 --------------------
 Hostel: {order.hostel}
 Room Number: {order.room_number}
 Phone: {order.phone_number}
-Estimated Delivery: {order.estimated_delivery.timezone.localtime(timezone.now()).strftime('%I:%M %p')}
+Estimated Delivery: 15 mins
 
 Order Summary:
 -------------
@@ -263,8 +265,8 @@ Order Summary:
 Subtotal: KES {order.subtotal}
 Delivery Fee: KES {order.delivery_fee}
 Total Amount: KES {order.total}
+Estimated Delivery: 15 mins
 
-Payment Method: {order.payment_method.upper()}
 {payment_instructions}
 
 You can track your order status at:

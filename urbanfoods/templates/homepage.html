@@ -1420,6 +1420,7 @@
                     document.getElementById('successOrderNumber').innerText = data.order_number;
                     document.getElementById('successDeliveryTime').innerText = '15 mins';
                     document.getElementById('paymentSuccessModal').classList.remove('hidden');
+                    showAlert('Order placed successfully! Check your email inbox/spam folder for order details', 'success');
                 } else {
                     showAlert(data.message || 'Order could not be placed.', 'danger');
                 }
