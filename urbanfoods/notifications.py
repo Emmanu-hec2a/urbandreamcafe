@@ -247,7 +247,7 @@ Your order has been received and is being processed.
 Order Details:
 --------------
 Order Number: {order.order_number}
-Order Date: {order.created_at.timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}
+Order Date: {timezone.localtime(order.created_at).strftime('%B %d, %Y at %I:%M %p')}
 
 Payment Method: {order.payment_method.upper()}
 
@@ -256,7 +256,10 @@ Delivery Information:
 Hostel: {order.hostel}
 Room Number: {order.room_number}
 Phone: {order.phone_number}
-Estimated Delivery: 15 mins
+Estimated Delivery: {
+    timezone.localtime(order.estimated_delivery).strftime('%I:%M %p')
+    if order.estimated_delivery else '15 mins'
+}
 
 Order Summary:
 -------------
@@ -265,7 +268,10 @@ Order Summary:
 Subtotal: KES {order.subtotal}
 Delivery Fee: KES {order.delivery_fee}
 Total Amount: KES {order.total}
-Estimated Delivery: 15 mins
+Estimated Delivery: {
+    timezone.localtime(order.estimated_delivery).strftime('%I:%M %p')
+    if order.estimated_delivery else '15 mins'
+}
 
 {payment_instructions}
 
@@ -323,7 +329,7 @@ UrbanDreams Cafe
 
                 <div style="background-color: #f0f4ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #667eea; margin: 0 0 10px 0;">Order #{order.order_number}</h3>
-                    <p style="margin: 5px 0;"><strong>Order Date:</strong> {order.created_at.timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}</p>
+                    <p style="margin: 5px 0;"><strong>Order Date:</strong> {timezone.localtime(order.created_at).strftime('%B %d, %Y at %I:%M %p')}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #f59e0b; font-weight: bold;">{order.status.upper()}</span></p>
                 </div>
 
