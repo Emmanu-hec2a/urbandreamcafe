@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 
+local_time = timezone.localtime(timezone.now())
+
 def send_admin_order_notification(order):
     """Send email notification to admin when a new order is received"""
     subject = f'🔔 New Order: {order.order_number}'
@@ -118,7 +120,7 @@ UrbanDreams Cafe Admin System
                     </tr>
                     <tr>
                         <td style="padding: 8px 0;"><strong>Estimated Delivery:</strong></td>
-                        <td style="padding: 8px 0; color: #22c55e; font-weight: bold;">{order.estimated_delivery.strftime('%I:%M %p')}</td>
+                        <td style="padding: 8px 0; color: #22c55e; font-weight: bold;">15 mins</td>
                     </tr>
                 </table>
 
@@ -175,7 +177,7 @@ UrbanDreams Cafe Admin System
                 
                 <p style="margin-top: 30px; color: #718096; font-size: 12px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                     This is an automated notification from UrbanDreams Cafe Admin System<br>
-                    Sent at {timezone.now().strftime('%B %d, %Y at %I:%M %p')}
+                    Sent at {timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}
                 </p>
             </div>
         </div>
@@ -252,7 +254,7 @@ Delivery Information:
 Hostel: {order.hostel}
 Room Number: {order.room_number}
 Phone: {order.phone_number}
-Estimated Delivery: {order.estimated_delivery.strftime('%I:%M %p')}
+Estimated Delivery: {order.estimated_delivery.timezone.localtime(timezone.now()).strftime('%I:%M %p')}
 
 Order Summary:
 -------------
@@ -289,27 +291,27 @@ UrbanDreams Cafe
         for item in order.items.all()
     ])
     
-    payment_html = ""
-    if order.payment_method == 'cash':
-        payment_type = "Till" if order.store_type == 'liquor' else "Till Number"
-        payment_number = "8330098 - NETWIX" if order.store_type == 'liquor' else "6960814 - MOSES ONKUNDI ATINDA"
-        payment_html = f'''
-        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
-            <h3 style="color: #856404; margin-top: 0;">⚠️ Payment Required</h3>
-            <p style="margin: 10px 0;"><strong>Please complete payment using M-PESA {payment_type}:</strong></p>
-            <p style="margin: 5px 0; font-size: 1.1em;"><strong>{payment_type}:</strong> <span style="color: #667eea; font-size: 1.3em; font-weight: bold;">{payment_number}</span></p>
-            {"<p style='margin: 5px 0;'><strong>Account Number:</strong> " + order.order_number + "</p>" if order.store_type == 'liquor' else ""}
-            <p style="margin: 5px 0;"><strong>Amount:</strong> <span style="color: #22c55e; font-size: 1.2em; font-weight: bold;">KES {order.total}</span></p>
-            <p style="margin: 10px 0 0 0; font-size: 0.9em; color: #856404;">Your order will be processed once payment is confirmed by our team.</p>
-        </div>
-        '''
+    # payment_html = ""
+    # if order.payment_method == 'cash':
+    #     payment_type = "Till" if order.store_type == 'liquor' else "Till Number"
+    #     payment_number = "8330098 - NETWIX" if order.store_type == 'liquor' else "6960814 - MOSES ONKUNDI ATINDA"
+    #     payment_html = f'''
+    #     <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
+    #         <h3 style="color: #856404; margin-top: 0;">⚠️ Payment Required</h3>
+    #         <p style="margin: 10px 0;"><strong>Please complete payment using M-PESA {payment_type}:</strong></p>
+    #         <p style="margin: 5px 0; font-size: 1.1em;"><strong>{payment_type}:</strong> <span style="color: #667eea; font-size: 1.3em; font-weight: bold;">{payment_number}</span></p>
+    #         {"<p style='margin: 5px 0;'><strong>Account Number:</strong> " + order.order_number + "</p>" if order.store_type == 'liquor' else ""}
+    #         <p style="margin: 5px 0;"><strong>Amount:</strong> <span style="color: #22c55e; font-size: 1.2em; font-weight: bold;">KES {order.total}</span></p>
+    #         <p style="margin: 10px 0 0 0; font-size: 0.9em; color: #856404;">Your order will be processed once payment is confirmed by our team.</p>
+    #     </div>
+    #     '''
     
     html_message = f'''
     <html>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <div style="max-width: 650px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 10px 10px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0;">✅ Order Confirmed!</h1>
+                <h1 style="color: white; margin: 0;">Order Confirmed!</h1>
                 <p style="color: white; margin: 10px 0 0 0; font-size: 1.1em;">Thank you for your order</p>
             </div>
             
@@ -319,12 +321,11 @@ UrbanDreams Cafe
 
                 <div style="background-color: #f0f4ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #667eea; margin: 0 0 10px 0;">Order #{order.order_number}</h3>
-                    <p style="margin: 5px 0;"><strong>Order Date:</strong> {order.created_at.strftime('%B %d, %Y at %I:%M %p')}</p>
+                    <p style="margin: 5px 0;"><strong>Order Date:</strong> {order.created_at.timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #f59e0b; font-weight: bold;">{order.status.upper()}</span></p>
                 </div>
 
-                {payment_html}
-
+                <!--
                 <h3 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">Delivery Information</h3>
                 <table style="width: 100%; margin-bottom: 20px;">
                     <tr>
@@ -341,9 +342,10 @@ UrbanDreams Cafe
                     </tr>
                     <tr>
                         <td style="padding: 8px 0;"><strong>Estimated Delivery:</strong></td>
-                        <td style="padding: 8px 0; color: #22c55e; font-weight: bold; font-size: 1.1em;">{order.estimated_delivery.strftime('%I:%M %p')}</td>
+                        <td style="padding: 8px 0; color: #22c55e; font-weight: bold; font-size: 1.1em;">15 mins</td>
                     </tr>
                 </table>
+                -->
 
                 <h3 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">Order Summary</h3>
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -390,7 +392,7 @@ UrbanDreams Cafe
                 <p style="margin-top: 30px; color: #718096; font-size: 12px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px;">
                     Thank you for choosing Urban Dreams Cafe!<br>
                     This email was sent to {order.user.email}<br>
-                    Sent at {timezone.now().strftime('%B %d, %Y at %I:%M %p')}
+                    Sent at {timezone.localtime(timezone.now()).strftime('%B %d, %Y at %I:%M %p')}
                 </p>
             </div>
         </div>
