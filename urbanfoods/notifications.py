@@ -10,7 +10,7 @@ def send_admin_order_notification(order):
     # Get order items
     items_list = "\n".join([
         f"  - {item.food_item.name} x{item.quantity} @ KES {item.price_at_order}"
-        for item in order.orderitem_set.all()
+        for item in order.items.all()
     ])
     
     # Plain text version
@@ -68,7 +68,7 @@ UrbanDreams Cafe Admin System
             <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">KES {item.quantity * item.price_at_order}</td>
         </tr>
         '''
-        for item in order.orderitem_set.all()
+        for item in order.items.all()
     ])
     
     html_message = f'''
@@ -205,7 +205,7 @@ def send_customer_order_confirmation(order):
     # Get order items
     items_list = "\n".join([
         f"  - {item.food_item.name} x{item.quantity} @ KES {item.price_at_order}"
-        for item in order.orderitem_set.all()
+        for item in order.items.all()
     ])
     
     payment_instructions = ""
@@ -286,7 +286,7 @@ UrbanDreams Cafe
             <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">KES {item.quantity * item.price_at_order}</td>
         </tr>
         '''
-        for item in order.orderitem_set.all()
+        for item in order.items.all()
     ])
     
     payment_html = ""
