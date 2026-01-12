@@ -956,7 +956,7 @@
             if (Notification.permission === 'granted') {
                 new Notification('New Orders Received!', {
                     body: `${count} new order(s) pending`,
-                    icon: '/static/logo.png'
+                    icon: '/static/favicon.png'
                 });
 
                 // Play sound alert
@@ -967,7 +967,7 @@
         function playNotificationSound() {
             // Create audio element for notification sound
             const audio = new Audio('/static/notification.mp3');
-            audio.volume = 0.5;
+            audio.volume = 0.7;
 
             // Fallback to beep if audio file doesn't exist
             audio.addEventListener('error', function() {
